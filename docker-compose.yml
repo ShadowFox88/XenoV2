@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: "XenoDB"
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=Xeno
+      - POSTGRES_PASSWORD=Xeno
+      - POSTGRES_DATABASE=XenoDB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Xeno"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+
+  bot:
+    container_name: "Xeno"
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/main
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      JISHAKU_HIDE: "True"
+      JISHAKU_RETAIN: "True"
+      JISHAKU_NO_UNDERSCORE: "True"
+      JISHAKU_FORCE_PAGINATOR: "True"
+      JISHAKU_NO_DM_TRACEBACK: "True"
+
+volumes:
+  pg_data:
+  .:

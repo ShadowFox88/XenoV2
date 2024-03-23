@@ -8,7 +8,7 @@ services:
     environment:
       - POSTGRES_USER=Xeno
       - POSTGRES_PASSWORD=Xeno
-      - POSTGRES_DATABASE=XenoDB
+      - POSTGRES_DB=XenoDB
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:

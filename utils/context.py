@@ -2,8 +2,9 @@ import discord
 from utils import views
 from discord import PartialEmoji as get_emoji
 from discord.ext import commands
-from typing import Any
-from utils.bot import Xeno  # noqa: F401
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from utils.bot import Xeno  # noqa: F401
 
 
 class XenoContext(commands.Context["Xeno"]):

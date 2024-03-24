@@ -61,7 +61,7 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
 async def main() -> None:
     async with bot:
-        await bot.start(os.environ["token"])
+        await bot.start(os.environ["TOKEN"])
 
 
 if __name__ == "__main__":

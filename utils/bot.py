@@ -9,16 +9,20 @@ import datetime
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
-        super().__init__(self.get_prefix, *args, **kwargs)
+        super().__init__(self.get_prefix, *args, **kwargs, case_insensitive=True)
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
             "animated_red_cross": "<a:AnimatedRedCross:789586505974022164>",
         }
+
+        self.cooldown: commands.CooldownMapping[discord.Message] = commands.CooldownMapping.from_cooldown(1, 1.5, commands.BucketType.member)
         self.command_counter = 0
+        self.launch_time = discord.utils.utcnow()
         self.maintenance = False
+        self.owner_ids = [606648465065246750]
 
     async def get_prefix(self, message):
-        return ["x-", "==", "<@737738422067658762>"]
+        return commands.when_mentioned_or(*["x-", "==", "<@737738422067658762>"])
 
     async def setup_hook(self):
         self.db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(
@@ -30,6 +34,9 @@ class Xeno(commands.AutoShardedBot):
 
         if not self.db:
             raise RuntimeError("Couldn't connect to database!")
+        
+        with open("schema.sql") as file:
+            await self.db.execute(file.read())
 
         await self.load_extension("jishaku")
 

@@ -12,9 +12,7 @@ from utils.errors import BlacklistedError, MaintenanceError
 
 load_dotenv()
 
-bot = commands.AutoShardedBot()
-
-bot = Xeno(intents=discord.Intents.all(), command_prefix="x-")
+bot = Xeno(intents=discord.Intents.all())
 
 
 @bot.event

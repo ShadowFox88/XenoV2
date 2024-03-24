@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     prefix varchar(10) NOT NULL default 'x-'
 );
 
-CREATE TYPE blacklist_type AS ENUM ('user', 'guild');
+CREATE TYPE blacklist_type IF NOT EXISTS AS ENUM ('user', 'guild');
 
 CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,

@@ -17,7 +17,8 @@ bot = Xeno(intents=discord.Intents.all())
 
 @bot.event
 async def on_ready() -> None:
-    print(f"Logged in as {bot.user} ({bot.user.id})")
+    if bot.user is not None:
+        print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")
 
 @bot.after_invoke
@@ -28,7 +29,7 @@ async def command_counter(ctx: XenoContext) -> None:
 @bot.check_once
 async def blacklist(ctx: XenoContext) -> Literal[True]:
     "A check that gets applied before commands to make sure a blacklisted user can't use commands."
-    if not bot.is_blacklisted(ctx.author.id) or ctx.author.id in bot.owner_ids:
+    if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True
     raise BlacklistedError
 

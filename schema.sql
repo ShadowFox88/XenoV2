@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS blacklist (
     name text NOT NULL,
     type blacklist_type NOT NULL,
     blacklisted_on timestamp with time zone NOT NULL default now(),
-    blacklisted_until timestamp with time zone NOT NULL
+    blacklisted_until timestamp with time zone NOT NULL default now() + interval '3 years',
+    blacklist_active boolean NOT NULL default true
 );
 
 CREATE TABLE IF NOT EXISTS guilds (

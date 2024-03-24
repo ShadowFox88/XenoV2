@@ -1,7 +1,7 @@
 import discord
 
 class DeleteView(discord.ui.View):
-    def __init__(self, author: discord.Member):
+    def __init__(self, author: discord.Member | discord.User):
         super().__init__(timeout=None)
         self.author = author
 
@@ -12,6 +12,7 @@ class DeleteView(discord.ui.View):
         if not interaction.message:
             return
         if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
+            self.stop()
             return await interaction.message.delete()
         await interaction.response.send_message(
             f"This command was ran by {self.author.name}, so you can't delete it!",
@@ -24,7 +25,7 @@ class SupportView(discord.ui.View):
         self.add_item(discord.ui.Button(label="Support", url=f"discord://-/invite/{support_server}"))
         
 class ConfirmView(discord.ui.View):
-    def __init__(self, author: discord.Member):
+    def __init__(self, author: discord.Member | discord.User):
         super().__init__(timeout=None)
         self.author = author
         self.value: bool | None = None
@@ -36,8 +37,9 @@ class ConfirmView(discord.ui.View):
         if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
             self.value = True
             self.stop()
+            return
         await interaction.response.send_message(
-            f"This command was ran by {self.author.name}, so you can't delete it!",
+            f"This command was ran by {self.author.name}, so you can't respond to it!",
             ephemeral=True,
         )
       
@@ -48,7 +50,8 @@ class ConfirmView(discord.ui.View):
         if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
             self.value = True
             self.stop()
+            return
         await interaction.response.send_message(
-            f"This command was ran by {self.author.name}, so you can't delete it!",
+            f"This command was ran by {self.author.name}, so you can't respond to it!",
             ephemeral=True,
-        )  
+        )

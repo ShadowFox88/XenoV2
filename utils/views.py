@@ -1,13 +1,9 @@
 import discord
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from utils.context import XenoContext
 
 class DeleteView(discord.ui.View):
-    def __init__(self, ctx: XenoContext):
+    def __init__(self, author: discord.Member):
         super().__init__(timeout=None)
-        self.ctx = ctx
+        self.author = author
 
     @discord.ui.button(
         emoji="\U0001f5d1", label="Delete", style=discord.ButtonStyle.danger, custom_id="delete"
@@ -15,10 +11,10 @@ class DeleteView(discord.ui.View):
     async def delete(self, interaction: discord.Interaction, _) -> None | discord.Interaction:
         if not interaction.message:
             return
-        if interaction.user.id == self.ctx.author.id or interaction.user.id == 606648465065246750:
+        if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
             return await interaction.message.delete()
         await interaction.response.send_message(
-            f"This command was ran by {self.ctx.author.name}, so you can't delete it!",
+            f"This command was ran by {self.author.name}, so you can't delete it!",
             ephemeral=True,
         )
 
@@ -28,20 +24,20 @@ class SupportView(discord.ui.View):
         self.add_item(discord.ui.Button(label="Support", url=f"discord://-/invite/{support_server}"))
         
 class ConfirmView(discord.ui.View):
-    def __init__(self, ctx: XenoContext):
+    def __init__(self, author: discord.Member):
         super().__init__(timeout=None)
-        self.ctx = ctx
+        self.author = author
         self.value: bool | None = None
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
     async def yes(self, interaction: discord.Interaction, _) -> None | discord.Interaction:
         if not interaction.message:
             return
-        if interaction.user.id == self.ctx.author.id or interaction.user.id == 606648465065246750:
+        if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
             self.value = True
             self.stop()
         await interaction.response.send_message(
-            f"This command was ran by {self.ctx.author.name}, so you can't delete it!",
+            f"This command was ran by {self.author.name}, so you can't delete it!",
             ephemeral=True,
         )
       
@@ -49,10 +45,10 @@ class ConfirmView(discord.ui.View):
     async def no(self, interaction: discord.Interaction, _) -> None | discord.Interaction:
         if not interaction.message:
             return
-        if interaction.user.id == self.ctx.author.id or interaction.user.id == 606648465065246750:
+        if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
             self.value = True
             self.stop()
         await interaction.response.send_message(
-            f"This command was ran by {self.ctx.author.name}, so you can't delete it!",
+            f"This command was ran by {self.author.name}, so you can't delete it!",
             ephemeral=True,
         )  

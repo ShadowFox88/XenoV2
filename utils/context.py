@@ -21,7 +21,7 @@ class XenoContext(commands.Context["Xeno"]):
             return await super().send(content, **kwargs)
         
         if button:
-            kwargs["view"] = views.DeleteView(self)
+            kwargs["view"] = views.DeleteView(author = self.author)
 
         return await super().send(content, **kwargs)
 

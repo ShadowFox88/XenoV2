@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     name text NOT NULL,
     type blacklist_type NOT NULL,
-    blacklisted_on timestamp with time zone NOT NULL default now()
+    blacklisted_on timestamp with time zone NOT NULL default now(),
     blacklisted_until timestamp with time zone NOT NULL
 );
 

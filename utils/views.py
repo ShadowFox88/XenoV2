@@ -1,5 +1,8 @@
 import discord
-from utils.context import XenoContext
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from utils.context import XenoContext
 
 class DeleteView(discord.ui.View):
     def __init__(self, ctx: XenoContext):

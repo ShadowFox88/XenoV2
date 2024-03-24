@@ -10,7 +10,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: SSH into server and update and restart API
+      - name: SSH into server and update and restart bot
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}

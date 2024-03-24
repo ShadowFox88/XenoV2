@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class XenoContext(commands.Context["Xeno"]):
-    async def send(self, content: str | None = None, button: bool = False, **kwargs: Any):
+    async def send(self, content: str | None = None, button: bool = False, no_reply: bool = True, **kwargs: Any):
         for embed in kwargs.get("embeds", []):
             embed.colour = embed.colour or self.author.color
             embed.timestamp = embed.timestamp or discord.utils.utcnow()
@@ -23,13 +23,10 @@ class XenoContext(commands.Context["Xeno"]):
         
         if button:
             kwargs["view"] = views.DeleteView(author = self.author)
-
-        return await super().send(content, **kwargs)
-
-    async def reply(self, *args: Any, **kwargs: Any):
-        kwargs["mention_author"] = kwargs.get("mention_author", False)
-
-        return await super().reply(*args, **kwargs)
+        if no_reply:
+            return await super().send(content, **kwargs)
+        else:
+            return await super().reply(content, **kwargs)
     
     async def confirm(self, message: str | None = None, *, embed: discord.Embed | None = None, confirm_messsage: str = 'Press "yes" to accept, or press "no" to deny',
             timeout: int = 60, delete_message_after: bool = False, remove_view_after: bool = True,

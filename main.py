@@ -16,6 +16,11 @@ load_dotenv()
 bot = Xeno(intents=discord.Intents.all())
 
 
+@bot.event
+async def on_ready() -> None:
+    print(f"Logged in as {bot.user} ({bot.user.id})")
+    print(f"Launched at {bot.launch_time}")
+
 @bot.after_invoke
 async def command_counter(ctx: XenoContext) -> None:
     ctx.bot.command_counter += 1

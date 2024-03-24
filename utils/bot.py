@@ -9,7 +9,7 @@ import datetime
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
-        super().__init__(self.get_prefix, *args, **kwargs, case_insensitive=True)
+        super().__init__(command_prefix=self.get_prefix, *args, **kwargs, case_insensitive=True)
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
             "animated_red_cross": "<a:AnimatedRedCross:789586505974022164>",
@@ -22,7 +22,7 @@ class Xeno(commands.AutoShardedBot):
         self.owner_ids = [606648465065246750]
 
     async def get_prefix(self, message):
-        return commands.when_mentioned_or(*["x-", "==", "<@737738422067658762>"])
+        return commands.when_mentioned_or(*["x-", "=="])(self, message)
 
     async def setup_hook(self):
         self.db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(

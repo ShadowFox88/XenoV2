@@ -28,20 +28,20 @@ class XenoContext(commands.Context["Xeno"]):
         else:
             return await super().reply(content, **kwargs)
     
-    async def confirm(self, message: str | None = None, *, embed: discord.Embed | None = None, confirm_messsage: str = 'Press "yes" to accept, or press "no" to deny',
+    async def confirm(self, message: str | None = None, *, embed: discord.Embed | None = None, confirm_message: str = 'Press "yes" to accept, or press "no" to deny',
             timeout: int = 60, delete_message_after: bool = False, remove_view_after: bool = True,
             no_reply: bool = False, ephemeral: bool = False, **kwargs: Any) -> bool | None:
         if delete_message_after and remove_view_after:
             raise ValueError("Cannot have both delete_message_after and remove_view_after keyword arguments.")
         if embed:
-            embed.description = f"{embed.description}\n\n{confirm_messsage}" if embed.description else confirm_messsage
+            embed.description = f"{embed.description}\n\n{confirm_message}" if embed.description else confirm_message
         elif message:
-            message = f"{message}\n\n{confirm_messsage}"
+            message = f"{message}\n\n{confirm_message}"
         view = views.ConfirmView(self.author)
         msg = await self.send(content=message, embed=embed, no_reply=no_reply, ephemeral=ephemeral, view=view, **kwargs)
         await view.wait()
         if delete_message_after:
-            await self.message.delete()
+            await msg.delete()
         if remove_view_after:
             await msg.edit(view=None)
         return view.value        

@@ -31,7 +31,7 @@ class Xeno(commands.AutoShardedBot):
         if not self.db:
             raise RuntimeError("Couldn't connect to database!")
 
-        await self.load_extension("Jishaku")
+        await self.load_extension("jishaku")
 
     def format_print(self, text):
         format = str(datetime.now().strftime("%x | %X") + f" | {text}")

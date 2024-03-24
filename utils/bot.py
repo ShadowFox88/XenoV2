@@ -64,3 +64,7 @@ class Xeno(commands.AutoShardedBot):
         # use the new MyContext class
         # use the new MyContext class
         return await super().get_context(message, cls=cls)
+    
+    def is_blacklisted(self, user_id: int):
+        return False
+        #return user_id in self.blacklisted

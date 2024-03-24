@@ -1,3 +1,9 @@
-discord.py
+asyncio
+aiohttp
 asyncpg
+asyncpg_stubs
+cachetools
+discord.py
 jishaku
+python-dotenv
+typing_extensions

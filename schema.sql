@@ -3,7 +3,11 @@ CREATE TABLE IF NOT EXISTS users (
     prefix varchar(10) NOT NULL default 'x-'
 );
 
-CREATE TYPE IF NOT EXISTS blacklist_type AS ENUM ('user', 'guild');
+DO $$ BEGIN
+    CREATE TYPE blacklist_type AS ENUM ('user', 'guild');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,

@@ -48,7 +48,7 @@ class ConfirmView(discord.ui.View):
         if not interaction.message:
             return
         if interaction.user.id == self.author.id or interaction.user.id == 606648465065246750:
-            self.value = True
+            self.value = False
             self.stop()
             return
         await interaction.response.send_message(

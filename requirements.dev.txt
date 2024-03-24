@@ -1,0 +1,6 @@
+pyright
+pip
+black
+isort
+asyncpg-stubs
+python-dotenv

@@ -35,6 +35,7 @@ services:
       JISHAKU_NO_UNDERSCORE: "True"
       JISHAKU_FORCE_PAGINATOR: "True"
       JISHAKU_NO_DM_TRACEBACK: "True"
+      PYTHONUNBUFFERED: 1
 
 volumes:
   pg_data:

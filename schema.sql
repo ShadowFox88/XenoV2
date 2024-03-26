@@ -39,7 +39,7 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS user_channels (
     owner BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    channel_id UNIQUE BIGINT NOT NULL,
+    channel_id BIGINT NOT NULL,
     pit_type pit_type NOT NULL,
     archive_mode archive_mode
 )

@@ -20,6 +20,7 @@ class Xeno(commands.AutoShardedBot):
         self.launch_time = discord.utils.utcnow()
         self.maintenance = False
         self.owner_ids: List[int] = [606648465065246750] # type: ignore
+        self.owner = self.get_user(self.owner_ids[0])
         self.blacklisted: List[int] = []
         self.support_server: str = ""
 
@@ -73,3 +74,5 @@ class Xeno(commands.AutoShardedBot):
         return ctx.author.id in self.blacklisted
         return False
         #return user_id in self.blacklisted
+
+    

@@ -64,12 +64,6 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
     return True
 
 
-@bot.command()
-async def test1(ctx: XenoContext):
-    await ctx.send("Test")
-    await ctx.confirm("Test", confirm_message = "Say 'Yes' if you are good else 'No'")
-
-
 async def main() -> None:
     async with bot:
         await bot.start(os.environ["TOKEN"])

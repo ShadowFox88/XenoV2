@@ -22,3 +22,24 @@ CREATE TABLE IF NOT EXISTS guilds (
     id BIGINT PRIMARY KEY,
     prefix varchar(10) NOT NULL
 );
+
+DO $$ BEGIN
+    CREATE TYPE pit_type AS ENUM ('text', 'voice');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+-- thanks Leo: https://github.com/DuckBot-Discord/duck-hideout-manager-bot/blob/main/schema.sql
+DO $$
+BEGIN
+        CREATE TYPE archive_mode AS ENUM ('leave', 'inactive', 'manual');
+    EXCEPTION
+        WHEN duplicate_object THEN null;
+END$$;
+
+CREATE TABLE IF NOT EXISTS user_channels (
+    owner BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    channel_id UNIQUE BIGINT NOT NULL,
+    pit_type pit_type NOT NULL,
+    archive_mode archive_mode
+)

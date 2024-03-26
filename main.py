@@ -67,7 +67,7 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
     return True
 
-
+@bot.event
 async def on_command_error(ctx: XenoContext, error: Exception):
     # Handle your errors here
     # All unhandled errors will print their original traceback

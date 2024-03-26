@@ -20,6 +20,7 @@ bot = Xeno(intents=discord.Intents.all())
 
 @bot.event
 async def on_ready() -> None:
+    bot.owner = bot.get_user(606648465065246750)
     if bot.user is not None:
         print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")

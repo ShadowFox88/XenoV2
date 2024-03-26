@@ -7,6 +7,7 @@ import git
 import psutil
 import os
 import datetime
+import humanfriendly
 
 class Information(commands.Cog):
     def __init__(self, bot: Xeno):
@@ -26,6 +27,21 @@ class Information(commands.Cog):
         disc_dt = f"<t:{time}:R>"
         
         return f"[`{id}`](https://github.com/ShadowFox88/XenoV2{commit.hexsha}) {message} ({disc_dt})"
+    
+    def strfdelta(self, tdelta: datetime.timedelta):
+        years, remainder = divmod(tdelta.total_seconds(), 31536000)  # seconds in a year=31536000.
+        months, remainder = divmod(remainder, 2592000)  # seconds in a month=2592000.
+        weeks, remainder = divmod(remainder, 604800)  # seconds in a week=604800.
+        days, remainder = divmod(remainder, 86400)  # seconds in a day=86400.
+        hours, remainder = divmod(remainder, 3600)  # seconds in an hour=3600.
+        minutes, seconds = divmod(remainder, 60)
+        intervals = [("y", years), ("mo", months), ("w", weeks), ("d", days), ("h", hours), ("m", minutes), ("s", seconds)]
+        non_zero_intervals = [(name, value) for name, value in intervals if value != 0]
+        if non_zero_intervals:
+            result = ', '.join(f"{value:.0f}{name}" for name, value in non_zero_intervals)
+            return result
+        else:
+            return "0s"
         
 
     @commands.command(alias=['stats', 'botinfo'])
@@ -36,6 +52,9 @@ class Information(commands.Cog):
         memory = self.process.memory_info().rss / 1024 ** 2
         total_memory = psutil.virtual_memory().total / 1024 ** 3
         usage = memory / (total_memory / 1024) * 100
+        uptime = self.strfdelta(discord.utils.utcnow() - self.bot.launch_time)
+        
+        
         
         embed = discord.Embed(description='Latest Commits:\n' + commits)
         embed.title = 'Bot Information'
@@ -46,7 +65,7 @@ class Information(commands.Cog):
         embed.add_field(name='Guilds', value=len(self.bot.guilds))
         embed.add_field(name='Users', value=len(self.bot.users))
         embed.add_field(name='Commands Run', value=self.bot.command_counter)
-        embed.add_field(name='Uptime', value=self.bot.format_print(str(discord.utils.utcnow() - self.bot.launch_time)))
+        embed.add_field(name='Uptime', value=uptime)
         embed.add_field(name='Process', value=f'`Memory: \n{memory:.2f}` MiB / `{total_memory:.2f}` GiB ({usage:.2f}%)\n `CPU`: \n{self.process.cpu_percent() / psutil.cpu_count():.2f}%')
         
         embed.set_footer(text="This section is dedicated to Runa.", icon_url='http://cds.vahin.dev/u/1FlYSp.png')

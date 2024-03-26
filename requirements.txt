@@ -9,4 +9,3 @@ python-dotenv
 typing_extensions
 gitpython
 psutil
-pkg_resources

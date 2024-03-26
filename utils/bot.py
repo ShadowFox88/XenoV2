@@ -6,6 +6,7 @@ import os
 from utils.context import XenoContext
 import re
 import datetime
+from utils.extensions import DefaultExtensions
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -42,6 +43,8 @@ class Xeno(commands.AutoShardedBot):
             await self.db.execute(file.read())
 
         await self.load_extension("jishaku")
+        
+        await DefaultExtensions().load_all_extensions(self)
 
     def format_print(self, text: str) -> str:
         format = str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")

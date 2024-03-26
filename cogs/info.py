@@ -7,7 +7,6 @@ import git
 import psutil
 import os
 import datetime
-import humanfriendly
 
 class Information(commands.Cog):
     def __init__(self, bot: Xeno):

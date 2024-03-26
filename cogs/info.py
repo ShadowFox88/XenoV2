@@ -46,7 +46,7 @@ class Information(commands.Cog):
         embed.add_field(name='Guilds', value=len(self.bot.guilds))
         embed.add_field(name='Users', value=len(self.bot.users))
         embed.add_field(name='Commands Run', value=self.bot.command_counter)
-        embed.add_field(name='Uptime', value=self.bot.format_print(str(datetime.datetime.now() - self.bot.launch_time)))
+        embed.add_field(name='Uptime', value=self.bot.format_print(str(discord.utils.utcnow() - self.bot.launch_time)))
         embed.add_field(name='Process', value=f'`Memory: \n{memory:.2f}` MiB / `{total_memory:.2f}` GiB ({usage:.2f}%)\n CPU: \n{self.process.cpu_percent() / psutil.cpu_count():.2f}%')
         
         embed.set_footer(text="This section is dedicated to Runa.", icon_url='http://cds.vahin.dev/u/1FlYSp.png')

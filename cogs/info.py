@@ -54,6 +54,7 @@ class Information(commands.Cog):
         
         await ctx.send(embed=embed, no_reply=False)
         
+        
 async def setup(bot: Xeno):
     cog = Information(bot)
     await bot.add_cog(cog)

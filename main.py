@@ -10,6 +10,9 @@ from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
 
+import traceback
+import sys
+
 load_dotenv()
 
 bot = Xeno(intents=discord.Intents.all())
@@ -63,6 +66,12 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
     return True
 
+
+async def on_command_error(ctx: XenoContext, error: Exception):
+    # Handle your errors here
+    # All unhandled errors will print their original traceback
+    print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 async def main() -> None:
     async with bot:

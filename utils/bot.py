@@ -76,3 +76,4 @@ class Xeno(commands.AutoShardedBot):
         #return user_id in self.blacklisted
 
     
+    

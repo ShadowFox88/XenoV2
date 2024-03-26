@@ -4,7 +4,7 @@ asyncpg
 asyncpg_stubs
 cachetools
 discord.py
-jishaku
+jishaku @ git+https://github.com/Gorialis/jishaku
 python-dotenv
 typing_extensions
 gitpython

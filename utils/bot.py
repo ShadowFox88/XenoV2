@@ -6,7 +6,6 @@ import os
 from utils.context import XenoContext
 import re
 import datetime
-from utils.extensions import DefaultExtensions
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -24,6 +23,9 @@ class Xeno(commands.AutoShardedBot):
         self.owner: discord.User | None = None
         self.blacklisted: List[int] = []
         self.support_server: str = ""
+        self.DEFAULT_EXTENSIONS = [
+            "cogs.info"
+        ]
 
     async def get_prefix(self, message: discord.Message):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
@@ -44,7 +46,13 @@ class Xeno(commands.AutoShardedBot):
 
         await self.load_extension("jishaku")
         
-        await DefaultExtensions().load_all_extensions(self)
+        for i in self.DEFAULT_EXTENSIONS:
+            try:
+                await self.load_extension(i)
+            except Exception as e:
+                print(f"Failed to load extension {i} with error {e}")
+        
+
 
     def format_print(self, text: str) -> str:
         format = str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")

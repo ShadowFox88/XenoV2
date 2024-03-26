@@ -51,7 +51,7 @@ class Information(commands.Cog):
         commits = '\n'.join(self.format_commit(c) for c in self.get_commits())
         memory = self.process.memory_info().rss / 1024 ** 2
         total_memory = psutil.virtual_memory().total / 1024 ** 3
-        usage = memory / (total_memory / 1024) * 100
+        usage = (memory / 1024) / total_memory * 100
         uptime = self.strfdelta(discord.utils.utcnow() - self.bot.launch_time)
         
         

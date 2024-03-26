@@ -71,6 +71,8 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 async def on_command_error(ctx: XenoContext, error: Exception):
     # Handle your errors here
     # All unhandled errors will print their original traceback
+    if isinstance(error, commands.CommandNotFound):
+        return
     print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
     await ctx.send(f"{error}, {type(error)}, {error.__traceback__}")
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

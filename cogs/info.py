@@ -25,7 +25,7 @@ class Information(commands.Cog):
         time = round(time.timestamp())
         disc_dt = f"<t:{time}:R>"
         
-        return f"[`{id}`](https://github.com/ShadowFox88/XenoV2{commit.hexsha}) {message} ({disc_dt})"
+        return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/{commit.hexsha}) {message} ({disc_dt})"
     
     def strfdelta(self, tdelta: datetime.timedelta):
         years, remainder = divmod(tdelta.total_seconds(), 31536000)  # seconds in a year=31536000.

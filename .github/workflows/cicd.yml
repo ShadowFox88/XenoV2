@@ -2,8 +2,8 @@ name: Docker CI/CD
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'restart-bot'
   workflow_dispatch:
 
 jobs:

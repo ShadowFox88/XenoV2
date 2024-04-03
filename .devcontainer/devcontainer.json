@@ -25,7 +25,9 @@
 				"njpwerner.autodocstring"
 			]
 		}
-	}
+	},
+
+	"postCreateCommand": "pip install -r requirements.txt && pip install -r requirements.dev.txt"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

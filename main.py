@@ -22,6 +22,7 @@ async def on_ready() -> None:
         print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")
 
+
 @bot.after_invoke
 async def command_counter(ctx: XenoContext) -> None:
     ctx.bot.command_counter += 1
@@ -60,9 +61,12 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
     retry_after: float | None = bucket.update_rate_limit()
     if retry_after:
-        raise commands.CommandOnCooldown(bucket, retry_after, commands.BucketType.member)
+        raise commands.CommandOnCooldown(
+            bucket, retry_after, commands.BucketType.member
+        )
 
     return True
+
 
 async def main() -> None:
     async with bot:

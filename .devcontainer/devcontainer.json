@@ -22,7 +22,9 @@
 				"dbaeumer.vscode-eslint",
 				"ms-azuretools.vscode-docker",
 				"adpyke.codesnap",
-				"njpwerner.autodocstring"
+				"njpwerner.autodocstring",
+				"KevinRose.vsc-python-indent",
+				"wdhongtw.gpg-indicator"
 			]
 		}
 	},

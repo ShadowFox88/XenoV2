@@ -58,7 +58,7 @@ class Xeno(commands.AutoShardedBot):
             await self.db.execute(file.read())
             
             
-        record = await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = false")
+        record = await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = true")
         
         for i in record:
             self.blacklisted[i["id"]] = i["blacklist_reason"]

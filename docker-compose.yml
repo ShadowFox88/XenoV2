@@ -17,6 +17,17 @@ services:
       timeout: 1s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    env_file:
+      - pgadmin.env
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
   bot:
     container_name: "Xeno"
     restart: unless-stopped

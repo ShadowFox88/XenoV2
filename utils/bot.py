@@ -92,10 +92,6 @@ class Xeno(commands.AutoShardedBot):
         await self.db.close()
 
     async def get_context(self, message: discord.Message | discord.Interaction[discord.Client], *, cls: Any = XenoContext) -> Any:
-        # when you override this method, you pass your new Context
-        # subclass to the super() method, which tells the bot to
-        # use the new MyContext class
-        # use the new MyContext class
         return await super().get_context(message, cls=cls)
 
     def is_blacklisted(self, ctx: XenoContext):

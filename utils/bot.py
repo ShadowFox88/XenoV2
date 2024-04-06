@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from typing import Any, List, Dict
+from typing import Any, List
 
 import asyncpg
 import discord
@@ -28,7 +28,7 @@ class Xeno(commands.AutoShardedBot):
         self.maintenance: bool = False
         self.owner_ids: List[int] = [606648465065246750]  # type: ignore
         self.owner: discord.User | None = None
-        self.blacklisted: Dict[int, str] = {}
+        self.blacklisted: List[int] = []
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
         self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler"]
@@ -58,10 +58,10 @@ class Xeno(commands.AutoShardedBot):
             await self.db.execute(file.read())
             
             
-        record = await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = true")
+        record = await self.db.fetch("SELECT id FROM blacklist WHERE blacklist_active = true")
         
         for i in record:
-            self.blacklisted[i["id"]] = i["blacklist_reason"]
+            self.blacklisted.append(i["id"])
         
         await self.load_extension("jishaku")
 
@@ -100,6 +100,6 @@ class Xeno(commands.AutoShardedBot):
 
     def is_blacklisted(self, ctx: XenoContext):
         if ctx.guild:
-            return ctx.guild.id in self.blacklisted.keys()
-        return ctx.author.id in self.blacklisted.keys()
+            return ctx.guild.id in self.blacklisted
+        return ctx.author.id in self.blacklisted
         # return user_id in self.blacklisted

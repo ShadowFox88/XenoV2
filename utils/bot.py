@@ -58,7 +58,11 @@ class Xeno(commands.AutoShardedBot):
             await self.db.execute(file.read())
             
             
-        await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = false")
+        record = await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = false")
+        
+        for i in record:
+            self.blacklisted[i["id"]] = i["blacklist_reason"]
+        
         await self.load_extension("jishaku")
 
         for i in self.DEFAULT_EXTENSIONS:

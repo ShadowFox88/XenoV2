@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from typing import Any, List
+from typing import Any, List, Dict
 
 import asyncpg
 import discord
@@ -19,16 +19,17 @@ class Xeno(commands.AutoShardedBot):
         }
 
         self.cooldown: commands.CooldownMapping[discord.Message] = (
-            commands.CooldownMapping.from_cooldown(1, 1.5, commands.BucketType.member)
+            commands.CooldownMapping.from_cooldown(1, 1.5, commands.BucketType.member) # type: ignore
         )
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()
-        self.maintenance = False
+        self.maintenance: bool = False
         self.owner_ids: List[int] = [606648465065246750]  # type: ignore
         self.owner: discord.User | None = None
-        self.blacklisted: List[int] = []
+        self.blacklisted: Dict[int, str] = {}
         self.support_server: str = ""
-        self.DEFAULT_EXTENSIONS = ["cogs.info"]
+        self.error_webhook: discord.Webhook | None = discord.Webhook.from_url(os.environ["ERROR_WEBHOOK"])
+        self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks"]
 
     async def get_prefix(self, message: discord.Message):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
@@ -46,7 +47,9 @@ class Xeno(commands.AutoShardedBot):
 
         with open("schema.sql") as file:
             await self.db.execute(file.read())
-
+            
+            
+        await self.db.fetch("SELECT id, blacklist_reason FROM blacklist WHERE blacklist_active = false")
         await self.load_extension("jishaku")
 
         for i in self.DEFAULT_EXTENSIONS:
@@ -59,13 +62,8 @@ class Xeno(commands.AutoShardedBot):
         format = str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")
         return format
 
-    def get_message_emojis(
-        self, message: discord.Message
-    ) -> List[discord.PartialEmoji]:
-        regex = re.findall(
-            "<(?P<animated>a?):(?P<name>[a-zA-Z0-9_]{2,32}):(?P<id>[0-9]{18,22})>",
-            message.content,
-        )
+    def get_message_emojis(self, message: discord.Message) -> List[discord.PartialEmoji]:
+        regex = re.findall("<(?P<animated>a?):(?P<name>[a-zA-Z0-9_]{2,32}):(?P<id>[0-9]{18,22})>", message.content)
         emojis: List[discord.PartialEmoji] = []
         for animated, name, id in regex:
             emojis.append(
@@ -77,12 +75,7 @@ class Xeno(commands.AutoShardedBot):
         await super().close()
         await self.db.close()
 
-    async def get_context(
-        self,
-        message: discord.Message | discord.Interaction[discord.Client],
-        *,
-        cls: Any = XenoContext,
-    ) -> Any:
+    async def get_context(self, message: discord.Message | discord.Interaction[discord.Client], *, cls: Any = XenoContext) -> Any:
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class

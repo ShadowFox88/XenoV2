@@ -34,7 +34,7 @@ class Information(commands.Cog):
 
         return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/{commit.hexsha}) {message} ({disc_dt})"
 
-    def strfdelta(self, tdelta: datetime.timedelta):
+    def strfdelta(self, tdelta: datetime.timedelta) -> str:
         years, remainder = divmod(
             tdelta.total_seconds(), 31536000
         )  # seconds in a year=31536000.
@@ -62,7 +62,7 @@ class Information(commands.Cog):
             return "0s"
 
     @commands.command(alias=["stats", "botinfo"])
-    async def info(self, ctx: XenoContext):
+    async def info(self, ctx: XenoContext) -> None:
         """Tells you information about the bot itself."""
 
         commits = "\n".join(self.format_commit(c) for c in self.get_commits())
@@ -82,7 +82,7 @@ class Information(commands.Cog):
         embed.add_field(name="Commands Run", value=self.bot.command_counter + 1)
         embed.add_field(name="Uptime", value=uptime)
         embed.add_field(
-            name="Memory Usage",
+            name="Memory Usage (Process)",
             value=f"`{memory:.2f}` MiB / `{total_memory:.2f}` GiB (`{usage:.2f}%`)",
         )
         embed.add_field(

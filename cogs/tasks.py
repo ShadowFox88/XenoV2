@@ -15,3 +15,7 @@ class Tasks(commands.Cog):
     @update_blacklist.before_loop
     async def before(self):
         await self.bot.wait_until_ready()
+        
+async def setup(bot: Xeno):
+    cog = Tasks(bot)
+    await bot.add_cog(cog)

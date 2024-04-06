@@ -28,7 +28,7 @@ class Xeno(commands.AutoShardedBot):
         self.owner: discord.User | None = None
         self.blacklisted: Dict[int, str] = {}
         self.support_server: str = ""
-        self.error_webhook: discord.Webhook | None = discord.Webhook.from_url(os.environ["ERROR_WEBHOOK"])
+        self.error_webhook: discord.Webhook | None = discord.Webhook.from_url(os.environ["ERROR_WEBHOOK"], bot_token=os.environ["TOKEN"])
         self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks"]
 
     async def get_prefix(self, message: discord.Message):

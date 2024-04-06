@@ -8,6 +8,8 @@ import discord
 from discord.ext import commands
 
 from utils.context import XenoContext
+import aiohttp
+import logging
 
 
 class Xeno(commands.AutoShardedBot):
@@ -28,8 +30,15 @@ class Xeno(commands.AutoShardedBot):
         self.owner: discord.User | None = None
         self.blacklisted: Dict[int, str] = {}
         self.support_server: str = ""
-        self.error_webhook: discord.Webhook | None = discord.Webhook.from_url(os.environ["ERROR_WEBHOOK"], bot_token=os.environ["TOKEN"])
+        self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
         self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks"]
+        
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        discord.utils.setup_logging(handler=logging.FileHandler("bot.log"))
+        self.logger: logging.Logger = logging.getLogger("discord")
+        self.session: aiohttp.ClientSession = aiohttp.ClientSession()
+        self.token = token
+        await super().start(token)
 
     async def get_prefix(self, message: discord.Message):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
@@ -57,6 +66,9 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
+                
+    def get_error_webhook(self):
+        return discord.Webhook.from_url(self.error_webhook, session=self.session, bot_token=self.token)
 
     def format_print(self, text: str) -> str:
         format = str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")

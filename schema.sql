@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS blacklist (
 );
 
 DO $$ BEGIN
-    CREATE TYPE pit_type AS ENUM ('text', 'voice');
+    CREATE TYPE channel_type AS ENUM ('text', 'voice');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;

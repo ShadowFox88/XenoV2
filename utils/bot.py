@@ -31,7 +31,7 @@ class Xeno(commands.AutoShardedBot):
         self.blacklisted: Dict[int, str] = {}
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
-        self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks"]
+        self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler"]
         
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         discord.utils.setup_logging(handler=logging.FileHandler("bot.log"))
@@ -100,7 +100,6 @@ class Xeno(commands.AutoShardedBot):
 
     def is_blacklisted(self, ctx: XenoContext):
         if ctx.guild:
-            return ctx.guild.id in self.blacklisted
-        return ctx.author.id in self.blacklisted
-        return False
+            return ctx.guild.id in self.blacklisted.keys()
+        return ctx.author.id in self.blacklisted.keys()
         # return user_id in self.blacklisted

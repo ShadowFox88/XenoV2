@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS entities (
 );
 
 CREATE TABLE IF NOT EXISTS blacklist (
-    id BIGINT PRIMARY KEY REFERENCES entities(id) ON DELETE CASCADE,
+    id BIGINT REFERENCES entities(id) ON DELETE CASCADE,
     name text NOT NULL,
     type entity_type NOT NULL,
     blacklist_reason text NOT NULL default 'No reason provided',

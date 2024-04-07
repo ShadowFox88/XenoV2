@@ -1,9 +1,10 @@
 from discord.ext import commands
+import discord
 from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
 
-errors: dict[type[Exception], str] = {
+user_errors: dict[type[Exception], str] = {
     BlacklistedError: "You (or this guild) have been blacklisted from using the bot. I may remove this, but it's not likely. You may also have an expiry date on your blacklist.",
     MaintenanceError: "The bot is currently in maintenance mode, please wait.",
     commands.CommandOnCooldown: "You are on cooldown. Try this command again in {error.retry_after:.2f}s",
@@ -19,8 +20,21 @@ class ErrorHandler(commands.Cog):
         ignoredErrors = (commands.CommandNotFound, commands.PartialEmojiConversionFailure)
         if isinstance(error, ignoredErrors):
             return
-        if isinstance(error, tuple(errors.keys())):
-            return await ctx.send(errors[type(error)])
+        if isinstance(error, tuple(user_errors.keys())):
+            error_message = user_errors[type(error)]
+            
+            embed = discord.Embed(description="An error occurred while running this command.", colour=discord.Color.red())
+            embed.title = "ERROR"
+            
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
+            embed.add_field(name="", value=error_message)
+            
+            emoji: str = self.bot.emoji_list["animated_red_cross"]
+            await ctx.message.add_reaction(emoji)
+            
+            await ctx.send(embed=embed, reply=True, delete_after=30)
+        else:
+            raise error
         
         
 async def setup(bot: Xeno):

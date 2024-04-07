@@ -15,7 +15,7 @@ class XenoContext(commands.Context["Xeno"]):
         self,
         content: str | None = None,
         button: bool = False,
-        no_reply: bool = True,
+        reply: bool = False,
         **kwargs: Any,
     ):
         for embed in kwargs.get("embeds", []):
@@ -35,7 +35,7 @@ class XenoContext(commands.Context["Xeno"]):
 
         if button:
             kwargs["view"] = views.DeleteView(author=self.author)
-        if no_reply:
+        if reply:
             return await super().send(content, **kwargs)
         else:
             return await super().reply(content, **kwargs)

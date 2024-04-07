@@ -39,6 +39,11 @@ class Xeno(commands.AutoShardedBot):
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)
+        
+    async def close(self) -> None:
+        await self.session.close()
+        await self.db.close()
+        await super().close()
 
     async def get_prefix(self, message: discord.Message):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
@@ -86,10 +91,6 @@ class Xeno(commands.AutoShardedBot):
                 discord.PartialEmoji(animated=bool(animated), name=name, id=id)
             )
         return emojis
-
-    async def close(self):
-        await super().close()
-        await self.db.close()
 
     async def get_context(self, message: discord.Message | discord.Interaction[discord.Client], *, cls: Any = XenoContext) -> Any:
         return await super().get_context(message, cls=cls)

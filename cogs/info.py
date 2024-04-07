@@ -96,7 +96,7 @@ class Information(commands.Cog):
         )
         embed.timestamp = discord.utils.utcnow()
 
-        await ctx.send(embed=embed, no_reply=False)
+        await ctx.send(embed=embed)
 
 
 async def setup(bot: Xeno):

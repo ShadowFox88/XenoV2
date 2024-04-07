@@ -32,7 +32,7 @@ async def command_counter(ctx: XenoContext) -> None:
 async def blacklist(ctx: XenoContext) -> Literal[True]: #TODO: Check why this isn't workingz
     "A check that gets applied before commands to make sure a blacklisted user can't use commands."
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
-        await ctx.send("blacklist check passed?", reply=True)
+        await ctx.send("blacklist check passed?")
         return True
     raise BlacklistedError
 

@@ -36,9 +36,9 @@ class XenoContext(commands.Context["Xeno"]):
         if button:
             kwargs["view"] = views.DeleteView(author=self.author)
         if reply:
-            return await super().send(content, **kwargs)
-        else:
             return await super().reply(content, **kwargs)
+        else:
+            return await super().send(content, **kwargs)
 
     async def confirm(
         self,

@@ -19,7 +19,7 @@ class ErrorHandler(commands.Cog):
         ignoredErrors = (commands.CommandNotFound, commands.PartialEmojiConversionFailure)
         if isinstance(error, ignoredErrors):
             return
-        if isinstance(error, errors.keys()):
+        if isinstance(error, tuple(errors.keys())):
             return await ctx.send(errors[type(error)])
         
         

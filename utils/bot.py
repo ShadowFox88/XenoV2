@@ -96,6 +96,6 @@ class Xeno(commands.AutoShardedBot):
 
     def is_blacklisted(self, ctx: XenoContext):
         if ctx.guild:
-            return ctx.guild.id in self.blacklisted
+            return (ctx.guild.id in self.blacklisted) or (ctx.author.id in self.blacklisted)
         return ctx.author.id in self.blacklisted
         # return user_id in self.blacklisted

@@ -35,13 +35,11 @@ class Information(commands.Cog):
         return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/{commit.hexsha}) {message} ({disc_dt})"
 
     def strfdelta(self, tdelta: datetime.timedelta) -> str:
-        years, remainder = divmod(
-            tdelta.total_seconds(), 31536000
-        )  # seconds in a year=31536000.
-        months, remainder = divmod(remainder, 2592000)  # seconds in a month=2592000.
-        weeks, remainder = divmod(remainder, 604800)  # seconds in a week=604800.
-        days, remainder = divmod(remainder, 86400)  # seconds in a day=86400.
-        hours, remainder = divmod(remainder, 3600)  # seconds in an hour=3600.
+        years, remainder = divmod(tdelta.total_seconds(), 31536000)  # seconds in a year = 31536000.
+        months, remainder = divmod(remainder, 2592000)  # seconds in a month = 2592000.
+        weeks, remainder = divmod(remainder, 604800)  # seconds in a week = 604800.
+        days, remainder = divmod(remainder, 86400)  # seconds in a day = 86400.
+        hours, remainder = divmod(remainder, 3600)  # seconds in an hour = 3600.
         minutes, seconds = divmod(remainder, 60)
         intervals = [
             ("y", years),

@@ -24,9 +24,7 @@ class ErrorHandler(commands.Cog):
             error_message = user_errors[type(error)]
             
             embed = discord.Embed(description="An error occurred while running this command.", colour=discord.Color.red())
-            embed.title = "ERROR"
-            
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
+            embed.timestamp = embed.timestamp or discord.utils.utcnow()
             embed.add_field(name="", value=error_message)
             
             emoji: str = self.bot.emoji_list["animated_red_cross"]

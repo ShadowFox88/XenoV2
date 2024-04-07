@@ -18,7 +18,7 @@ class XenoContext(commands.Context["Xeno"]):
         reply: bool = False,
         **kwargs: Any,
     ):
-        embeds = kwargs.get("embeds", []) or kwargs.get("embed", [])
+        embeds = kwargs.get("embeds", []) or [kwargs.get("embed", [])]
         for embed in embeds:
             embed.colour = embed.colour or self.author.color
             embed.timestamp = embed.timestamp or discord.utils.utcnow()

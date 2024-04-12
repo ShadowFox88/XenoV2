@@ -25,14 +25,16 @@ class ErrorHandler(commands.Cog):
             
             embed = discord.Embed(colour=discord.Color.red())
             embed.timestamp = embed.timestamp or discord.utils.utcnow()
-            embed.add_field(name="An error occurred while running this command.", value=error_message)
+            embed.add_field(name="An error occurred while running this command.", value=error_message.format(error))
             
             emoji: str = self.bot.emoji_list["animated_red_cross"]
             await ctx.message.add_reaction(emoji)
             
             await ctx.send(embed=embed, reply=True, delete_after=30)
-        else:
-            raise error
+            return
+        
+        await ctx.send(f"Error: {error} has occured")
+        raise error
         
         
 async def setup(bot: Xeno):

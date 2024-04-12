@@ -9,7 +9,7 @@ from discord.ext import commands
 
 from utils.bot import Xeno
 from utils.context import XenoContext
-import timeit
+import time
 
 
 class Information(commands.Cog):
@@ -100,14 +100,25 @@ class Information(commands.Cog):
     @commands.command()
     async def ping(self, ctx: XenoContext) -> None:
         """Returns the latency of the bot."""
+
         discord_latency = round(self.bot.latency * 1000)
-        typing_latency = timeit.timeit('await ctx.send("Pong!", reply=True, delete_after=1)', number=1, globals=locals())
-        db_latency = timeit.timeit('await self.bot.db.execute("SELECT 1")')
+        
+        start = time.perf_counter()
+        message = await ctx.send("Pong!", reply=True)
+        end = time.perf_counter()
+        typing_latency = end - start
+        
+        start = time.perf_counter()
+        await self.bot.db.execute("SELECT 1")
+        end = time.perf_counter()
+        db_latency = end - start
         
         embed = discord.Embed(title="Pong!", colour=discord.Color.green())
         embed.add_field(name="Discord Latency", value=f"`{discord_latency}ms`")
         embed.add_field(name="Typing Latency", value=f"`{typing_latency:.2f}ms`")
         embed.add_field(name="Database Latency", value=f"`{db_latency:.2f}ms`")
+        
+        await message.edit(embed=embed, content=None)
         
 
 async def setup(bot: Xeno):

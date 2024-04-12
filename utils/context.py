@@ -27,15 +27,16 @@ class XenoContext(commands.Context["Xeno"]):
                     text=f"Command ran by {self.author.display_name}",
                     icon_url=self.author.display_avatar.url,
                 )
-                
+                  
         embed: discord.Embed | Any = kwargs.get("embed")
-        embed.colour = embed.colour or self.author.color
-        embed.timestamp = embed.timestamp or discord.utils.utcnow()
-        if not embed.footer.text:
-            embed.set_footer(
-                text=f"Command ran by {self.author.display_name}",
-                icon_url=self.author.display_avatar.url,
-            )
+        if embed:
+            embed.colour = embed.colour or self.author.color
+            embed.timestamp = embed.timestamp or discord.utils.utcnow()
+            if not embed.footer.text:
+                embed.set_footer(
+                    text=f"Command ran by {self.author.display_name}",
+                    icon_url=self.author.display_avatar.url,
+                )
 
         if (
             self.command

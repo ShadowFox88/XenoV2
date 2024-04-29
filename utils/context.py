@@ -27,7 +27,7 @@ class XenoContext(commands.Context["Xeno"]):
                     text=f"Command ran by {self.author.display_name}",
                     icon_url=self.author.display_avatar.url,
                 )
-                  
+
         embed: discord.Embed | Any = kwargs.get("embed")
         if embed:
             embed.colour = embed.colour or self.author.color

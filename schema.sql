@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS entities (
     type entity_type NOT NULL
 );
 
+
+
+
+
 CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT REFERENCES entities(id) ON DELETE CASCADE,
     name text NOT NULL,
@@ -26,6 +30,10 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
+
+
+
+
 -- thanks Leo: https://github.com/DuckBot-Discord/duck-hideout-manager-bot/blob/main/schema.sql
 DO $$
 BEGIN
@@ -40,3 +48,16 @@ CREATE TABLE IF NOT EXISTS user_channels (
     channel_type channel_type NOT NULL,
     archive_mode archive_mode
 )
+
+CREATE OR REPLACE FUNCTION check_user_entity_type() RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT type FROM entities WHERE id = NEW.owner) != 'user' THEN
+        RAISE EXCEPTION 'Invalid entity type for user_channels.owner. It must be user.';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_entity_type_before_insert_or_update
+BEFORE INSERT OR UPDATE OF owner ON user_channels
+FOR EACH ROW EXECUTE PROCEDURE check_user_entity_type(); +

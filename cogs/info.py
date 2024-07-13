@@ -33,7 +33,7 @@ class Information(commands.Cog):
         time = round(time.timestamp())
         disc_dt = f"<t:{time}:R>"
 
-        return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/{commit.hexsha}) {message} ({disc_dt})"
+        return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/commit/{commit.hexsha}) {message} ({disc_dt})"
 
     def strfdelta(self, tdelta: datetime.timedelta) -> str:
         years, remainder = divmod(

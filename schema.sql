@@ -4,21 +4,16 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS entities (
     id BIGINT PRIMARY KEY,
     prefix varchar(10) NOT NULL default 'x-',
-    type entity_type NOT NULL
+    entity_type entity_type NOT NULL
 );
-
-
-
-
-
 
 CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT REFERENCES entities(id) ON DELETE CASCADE,
     name text NOT NULL,
-    type entity_type NOT NULL,
+    entity_type entity_type NOT NULL,
     blacklist_reason text NOT NULL default 'No reason provided',
     blacklisted_on timestamp with time zone NOT NULL default now(),
     blacklisted_until timestamp with time zone NOT NULL default now() + interval '888 years', -- Lifetime by default
@@ -30,10 +25,6 @@ DO $$ BEGIN
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
-
-
-
-
 
 -- thanks Leo: https://github.com/DuckBot-Discord/duck-hideout-manager-bot/blob/main/schema.sql
 DO $$

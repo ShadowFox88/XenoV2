@@ -48,7 +48,7 @@ async def maintenance(ctx: XenoContext) -> Literal[True]:
 
 @bot.check_once
 async def cooldown(ctx: XenoContext) -> Literal[True]:
-    "A check that gets applied before commands to make sure a user hasn't ran too many commands in X amount of time."
+    "A check that gets applied before commands to make sure a user hasn't ran too many commands in X amount of time." 
     if (
         ctx.author.id in bot.owner_ids
         or isinstance(ctx.author, discord.User)

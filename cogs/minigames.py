@@ -30,7 +30,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 return interaction.response.send_message(f"You aren't a player {interaction.user.mention}!", delete_after=5)
         else:
             if interaction.user.id != view.author.id:
-                return
+                return interaction.response.send_message(f"You aren't a player {interaction.user.mention}!", delete_after=5)
         
         if view.current_player == "X":
             self.style = discord.ButtonStyle.danger
@@ -79,6 +79,31 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 view.update_button(position[0], position[1], "O")
                 view.board[position[0]][position[1]] = "O" # type: ignore
                 view.current_player = "X"
+                
+        winner = view.check_winner()
+        if winner != None:
+            view.stop()
+
+            if winner == "Tie":
+                embed = discord.Embed(
+                    title = "Tic Tac Toe", 
+                    description = "It was a tie!", 
+                    color = discord.Colour.red()
+                )
+            else:
+                if winner == "X":
+                    winner = view.author.mention
+                elif view.two_player:
+                    winner = view.second_player.mention
+                else:
+                    winner = "The Computer"
+                embed = discord.Embed(
+                    title = "Tic Tac Toe", 
+                    description = f"{winner} won!", 
+                    color = discord.Colour.red()
+                )
+
+            return await interaction.response.edit_message(embed=embed, view=view)
         
         await interaction.response.edit_message(view=view)
         

@@ -5,54 +5,6 @@ import random
 from utils.bot import Xeno
 from utils.context import XenoContext
 
-class TicTacToe(discord.ui.View):
-    def __init__(self, two_player: bool = False):
-        super().__init__()
-        self.board = [
-            [None, None, None], 
-            [None, None, None], 
-            [None, None, None]
-        ]
-        self.current_player = "X"
-        self.two_player = two_player
-
-        for x in range(3):
-            for y in range(3):
-                self.add_item(TicTacToeButton(x, y))
-                
-    def check_winner(self):
-        # across
-        for across in self.board:
-            if across == ["X", "X", "X"]:
-                return "X"
-            elif across == ["O", "O", "O"]:
-                return "O"
-        
-        # vertical
-        for i in range(3):
-            if self.board[0][i] == self.board[1][i] == self.board[2][i]:
-                return self.board[0][i]
-            
-        # diagonal
-        if self.board[0][0] == self.board[1][1] == self.board[2][2]:
-            return self.board[0][0]
-        elif self.board[0][2] == self.board[1][1] == self.board[2][0]:
-            return self.board[0][2]
-        
-        if all(self.board[y][x] is not None for x in range(3) for y in range(3)):
-            return "Tie"
-        
-        return None
-    
-    def update_button(self, x: int, y: int, state: str):
-        for item in self.children:
-            if item.x == x and item.y == y: # type: ignore
-                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
-                item.label = state # type: ignore
-                item.disabled = True # type: ignore
-                
-                
-        
 
 class TicTacToeButton(discord.ui.Button["TicTacToe"]):
     def __init__(self, x: int, y: int):
@@ -108,6 +60,53 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 )
 
             return await interaction.response.edit_message(embed=embed, view=None)
+        
+        
+class TicTacToe(discord.ui.View):
+    def __init__(self, two_player: bool = False):
+        super().__init__()
+        self.board = [
+            [None, None, None], 
+            [None, None, None], 
+            [None, None, None]
+        ]
+        self.current_player = "X"
+        self.two_player = two_player
+
+        for x in range(3):
+            for y in range(3):
+                self.add_item(TicTacToeButton(x, y))
+                
+    def check_winner(self):
+        # across
+        for across in self.board:
+            if across == ["X", "X", "X"]:
+                return "X"
+            elif across == ["O", "O", "O"]:
+                return "O"
+        
+        # vertical
+        for i in range(3):
+            if self.board[0][i] == self.board[1][i] == self.board[2][i]:
+                return self.board[0][i]
+            
+        # diagonal
+        if self.board[0][0] == self.board[1][1] == self.board[2][2]:
+            return self.board[0][0]
+        elif self.board[0][2] == self.board[1][1] == self.board[2][0]:
+            return self.board[0][2]
+        
+        if all(self.board[y][x] is not None for x in range(3) for y in range(3)):
+            return "Tie"
+        
+        return None
+    
+    def update_button(self, x: int, y: int, state: str):
+        for item in self.children:
+            if item.x == x and item.y == y: # type: ignore
+                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
+                item.label = state # type: ignore
+                item.disabled = True # type: ignore
             
             
 
@@ -124,7 +123,7 @@ class Minigames(commands.Cog):
             description = "Get 3 in a row to win!", 
             color = discord.Colour.dark_blue()
         )
-        view = TicTacToe(two_player)
+        view = TicTacToe(True)
         await ctx.send(embed = embed, view=view)
         
         

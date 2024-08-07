@@ -23,11 +23,11 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         # Check if it's the player's turn
         if view.two_player:
             if interaction.user.id != view.author.id and view.current_player == "X":
-                return interaction.response.send_message("It's not your turn!", ephemeral=True)
+                return interaction.response.send_message(f"It's not your turn {interaction.user.mention}!", delete_after=5)
             elif interaction.user.id != view.second_player.id and view.current_player == "O":
-                return interaction.response.send_message("It's not your turn!", ephemeral=True)
+                return interaction.response.send_message(f"It's not your turn {interaction.user.mention}!", delete_after=5)
             elif interaction.user.id not in (view.author.id, view.second_player.id):
-                return interaction.response.send_message("You aren't a player!", ephemeral=True)
+                return interaction.response.send_message(f"You aren't a player {interaction.user.mention}!", delete_after=5)
         else:
             if interaction.user.id != view.author.id:
                 return
@@ -59,8 +59,10 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             else:
                 if winner == "X":
                     winner = view.author.mention
-                else:
+                elif view.two_player:
                     winner = view.second_player.mention
+                else:
+                    winner = "The Computer"
                 embed = discord.Embed(
                     title = "Tic Tac Toe", 
                     description = f"{winner} won!", 

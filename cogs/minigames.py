@@ -55,11 +55,11 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             else:
                 embed = discord.Embed(
                     title = "Tic Tac Toe", 
-                    description = "{winner} won!", 
+                    description = f"{winner} won!", 
                     color = discord.Colour.red()
                 )
 
-            return await interaction.response.edit_message(embed=embed, view=None)
+            return await interaction.response.edit_message(embed=embed)
         await interaction.response.edit_message(view=view)
         
         

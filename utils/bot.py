@@ -31,7 +31,7 @@ class Xeno(commands.AutoShardedBot):
         self.blacklisted: List[int] = []
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
-        self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler"]
+        self.DEFAULT_EXTENSIONS = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames"]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         discord.utils.setup_logging(handler=logging.FileHandler("bot.log"))

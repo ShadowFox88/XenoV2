@@ -38,15 +38,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             self.disabled = True
             view.board[self.x][self.y] = "X" # type: ignore
             view.current_player = "O"
-            
-            if not view.two_player:
-                position = [random.randint(0, 2), random.randint(0, 2)]
-                while view.board[position[0]][position[1]] is not None:
-                    position = [random.randint(0, 2), random.randint(0, 2)]
-                
-                view.update_button(position[0], position[1], "O")
-                view.board[position[0]][position[1]] = "O" # type: ignore
-                view.current_player = "X"
+
         else:
             self.style = discord.ButtonStyle.success
             self.label = "O"
@@ -65,6 +57,10 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                     color = discord.Colour.red()
                 )
             else:
+                if winner == "X":
+                    winner = view.author.mention
+                else:
+                    winner = view.second_player.mention
                 embed = discord.Embed(
                     title = "Tic Tac Toe", 
                     description = f"{winner} won!", 
@@ -72,6 +68,16 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 )
 
             return await interaction.response.edit_message(embed=embed, view=view)
+        
+        if not view.two_player:
+                position = [random.randint(0, 2), random.randint(0, 2)]
+                while view.board[position[0]][position[1]] is not None:
+                    position = [random.randint(0, 2), random.randint(0, 2)]
+                
+                view.update_button(position[0], position[1], "O")
+                view.board[position[0]][position[1]] = "O" # type: ignore
+                view.current_player = "X"
+        
         await interaction.response.edit_message(view=view)
         
         
@@ -91,6 +97,11 @@ class TicTacToe(discord.ui.View):
         for x in range(3):
             for y in range(3):
                 self.add_item(TicTacToeButton(x, y))
+                
+    def cancel_all_buttons(self):
+        for item in self.children:
+            assert isinstance(item, TicTacToeButton)
+            item.disabled = True
                 
     def check_winner(self):
         # across

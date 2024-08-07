@@ -46,11 +46,14 @@ class TicTacToe(discord.ui.View):
     
     def update_button(self, x: int, y: int, state: str):
         for item in self.children:
-            if item.x == x and item.y == y:
-                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success
-                item.label = state
-                item.disabled = True
-                break
+            if item.x == x and item.y == y: # type: ignore
+                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
+                item.label = state # type: ignore
+                item.disabled = True # type: ignore
+ # WHILE LOOP <------
+                # advay  🤪🍆🍆🍆🍑🍑🍑🍑🍑🥴🥴🍆🍆🍆🤪🤪💅💅💅💅💅
+                
+        
 
 class TicTacToeButton(discord.ui.Button["TicTacToe"]):
     def __init__(self, x: int, y: int):

@@ -4,13 +4,10 @@ from typing import Literal
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
 from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
-
-load_dotenv()
 
 bot = Xeno(intents=discord.Intents.all())
 

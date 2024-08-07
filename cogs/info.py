@@ -93,10 +93,6 @@ class Information(commands.Cog):
             value=f"`{self.process.cpu_percent() / psutil.cpu_count():.2f}%`",
         )
 
-        embed.set_footer(
-            text="This section is dedicated to Runa.",
-            icon_url="http://cds.vahin.dev/u/1FlYSp.png",
-        )
         embed.timestamp = discord.utils.utcnow()
 
         await ctx.send(embed=embed)

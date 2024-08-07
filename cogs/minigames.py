@@ -51,9 +51,6 @@ class TicTacToe(discord.ui.View):
                 item.label = state
                 item.disabled = True
                 break
-        
-        # thi
-
 
 class TicTacToeButton(discord.ui.Button["TicTacToe"]):
     def __init__(self, x: int, y: int):
@@ -95,9 +92,19 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             view.stop()
 
             if winner == "Tie":
-                return await interaction.response.edit_message(content = "It's a tie!")
+                embed = discord.Embed(
+                    title = "Tic Tac Toe", 
+                    description = "It was a tie!", 
+                    color = discord.Colour.red()
+                )
+            else:
+                embed = discord.Embed(
+                    title = "Tic Tac Toe", 
+                    description = "{winner} won!", 
+                    color = discord.Colour.red()
+                )
 
-            return await interaction.response.edit_message(content = f"{winner} won!")
+            return await interaction.response.edit_message(embed=embed, view=None)
             
             
 
@@ -108,29 +115,17 @@ class Minigames(commands.Cog):
         self.bot = bot      
         
     @commands.command()
-    async def tic_tac_toe(self, ctx: XenoContext, interaction: discord.Interaction):
+    async def tic_tac_toe(self, ctx: XenoContext, two_player: bool = False):
         embed = discord.Embed(
             title = "Tic Tac Toe", 
-            description = "Get 3 in a row to win! 🤪🤪💅💅", 
-            color = discord.Color.dark_blue()
+            description = "Get 3 in a row to win!", 
+            color = discord.Colour.dark_blue()
         )
-        
-        """
-        1 | 2 | 3
-        4 | 5 | 6
-        7 | 8 | 9
-        """
-        
-        grid = [[None, None, None] for _ in range(3)]
-
-        # Computer choice
-        computer = random.randint(1, 9)
-        
-        
-        await ctx.send(embed = embed)
+        view = TicTacToe(two_player)
+        await ctx.send(embed = embed, view=view)
         
         
 
 async def setup(bot: Xeno):
     cog = Minigames(bot)
-    await bot.add_cog(cog
+    await bot.add_cog(cog)

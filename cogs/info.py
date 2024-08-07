@@ -1,9 +1,6 @@
 import datetime
 import os
-<<<<<<< HEAD
-=======
 import time
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 from typing import List
 
 import discord
@@ -13,10 +10,6 @@ from discord.ext import commands
 
 from utils.bot import Xeno
 from utils.context import XenoContext
-<<<<<<< HEAD
-import time
-=======
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 
 
 class Information(commands.Cog):
@@ -40,19 +33,12 @@ class Information(commands.Cog):
         time = round(time.timestamp())
         disc_dt = f"<t:{time}:R>"
 
-<<<<<<< HEAD
-        return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/{commit.hexsha}) {message} ({disc_dt})"
-
-    def strfdelta(self, tdelta: datetime.timedelta) -> str:
-        years, remainder = divmod(tdelta.total_seconds(), 31536000)  # seconds in a year = 31536000.
-=======
         return f"[`{id}`](https://github.com/ShadowFox88/XenoV2/commit/{commit.hexsha}) {message} ({disc_dt})"
 
     def strfdelta(self, tdelta: datetime.timedelta) -> str:
         years, remainder = divmod(
             tdelta.total_seconds(), 31536000
         )  # seconds in a year = 31536000.
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
         months, remainder = divmod(remainder, 2592000)  # seconds in a month = 2592000.
         weeks, remainder = divmod(remainder, 604800)  # seconds in a week = 604800.
         days, remainder = divmod(remainder, 86400)  # seconds in a day = 86400.
@@ -118,42 +104,21 @@ class Information(commands.Cog):
         """Returns the latency of the bot."""
 
         discord_latency = round(self.bot.latency * 1000)
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
         start = time.perf_counter()
         message = await ctx.send("Pong!", reply=True)
         end = time.perf_counter()
         typing_latency = end - start
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
         start = time.perf_counter()
         await self.bot.db.execute("SELECT 1")
         end = time.perf_counter()
         db_latency = end - start
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
         embed = discord.Embed(title="Pong!", colour=discord.Color.green())
         embed.add_field(name="Discord Latency", value=f"`{discord_latency}ms`")
         embed.add_field(name="Typing Latency", value=f"`{typing_latency:.2f}ms`")
         embed.add_field(name="Database Latency", value=f"`{db_latency:.2f}ms`")
-<<<<<<< HEAD
-        
-        await message.edit(embed=embed, content=None)
-        
-=======
 
         await message.edit(embed=embed, content=None)
 
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 
 async def setup(bot: Xeno):
     cog = Information(bot)

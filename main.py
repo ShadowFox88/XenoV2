@@ -2,28 +2,23 @@ import os
 from asyncio import run
 from typing import Literal
 
-import discord
+import discord  #
 from discord.ext import commands
-<<<<<<< HEAD
-from dotenv import load_dotenv
-=======
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 
 from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
 
-<<<<<<< HEAD
-load_dotenv()
-
-=======
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 bot = Xeno(intents=discord.Intents.all())
 
 
 @bot.event
 async def on_ready() -> None:
-    bot.owners = [await bot.fetch_user(606648465065246750), await bot.fetch_user(811527737881002024), await bot.fetch_user(738662726179487764)]
+    bot.owners = [
+        await bot.fetch_user(606648465065246750),
+        await bot.fetch_user(811527737881002024),
+        await bot.fetch_user(738662726179487764),
+    ]
     if bot.user is not None:
         print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")
@@ -35,17 +30,7 @@ async def command_counter(ctx: XenoContext) -> None:
 
 
 @bot.check_once
-<<<<<<< HEAD
-async def blacklist(ctx: XenoContext) -> Literal[True]: #TODO: Check why this isn't workingz
-=======
-async def blacklist(
-    ctx: XenoContext,
-<<<<<<< HEAD
-) -> Literal[True]:  # TODO: Check why this isn't workingz
->>>>>>> c16029a6b0d57be697520862db627724b9f44afb
-=======
-) -> Literal[True]:  # TODO: Check why this isn't working !!
->>>>>>> f7952afcab8b37692caa36880e861805d2ebfa92
+async def blacklist(ctx: XenoContext) -> Literal[True]:  # TODO: Check why this isn't working !!
     "A check that gets applied before commands to make sure a blacklisted user can't use commands."
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True

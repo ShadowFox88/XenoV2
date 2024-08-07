@@ -24,7 +24,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             self.style = discord.ButtonStyle.danger
             self.label = "X"
             self.disabled = True
-            view.update_button(self.y, self.x, "X")
+            view.board[self.x][self.y] = "X"
             view.current_player = "O"
             
             if not view.two_player:
@@ -33,12 +33,13 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                     position = [random.randint(0, 2), random.randint(0, 2)]
                 
                 view.update_button(position[0], position[1], "O")
+                view.board[position[0]][position[1]] = "O"
                 view.current_player = "X"
         else:
             self.style = discord.ButtonStyle.success
             self.label = "O"
             self.disabled = True
-            view.update_button(self.y, self.x, "O")
+            view.board[self.x][self.y] = "O"
             view.current_player = "X"
             
         winner = view.check_winner()
@@ -59,6 +60,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 )
 
             return await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.response.edit_message(view=view)
         
         
 class TicTacToe(discord.ui.View):
@@ -103,7 +105,6 @@ class TicTacToe(discord.ui.View):
     def update_button(self, x: int, y: int, state: str):
         for item in self.children:
             if item.x == x and item.y == y: # type: ignore
-                print(item)
                 item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
                 item.label = state # type: ignore
                 item.disabled = True # type: ignore

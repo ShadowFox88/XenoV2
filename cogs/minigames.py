@@ -16,15 +16,27 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         assert self.view is not None
         view: TicTacToe = self.view
         state = view.board[self.x][self.y]
-        
+                
         if state is not None:
             return
+        
+        # Check if it's the player's turn
+        if view.two_player:
+            if interaction.user.id != view.author.id and view.current_player == "X":
+                return
+            elif interaction.user.id != view.second_player.id and view.current_player == "O":
+                return
+            elif interaction.user.id not in (view.author.id, view.second_player.id):
+                return
+        else:
+            if interaction.user.id != view.author.id:
+                return
         
         if view.current_player == "X":
             self.style = discord.ButtonStyle.danger
             self.label = "X"
             self.disabled = True
-            view.board[self.x][self.y] = "X"
+            view.board[self.x][self.y] = "X" # type: ignore
             view.current_player = "O"
             
             if not view.two_player:
@@ -33,13 +45,13 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                     position = [random.randint(0, 2), random.randint(0, 2)]
                 
                 view.update_button(position[0], position[1], "O")
-                view.board[position[0]][position[1]] = "O"
+                view.board[position[0]][position[1]] = "O" # type: ignore
                 view.current_player = "X"
         else:
             self.style = discord.ButtonStyle.success
             self.label = "O"
             self.disabled = True
-            view.board[self.x][self.y] = "O"
+            view.board[self.x][self.y] = "O" # type: ignore
             view.current_player = "X"
             
         winner = view.check_winner()
@@ -59,12 +71,12 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                     color = discord.Colour.red()
                 )
 
-            return await interaction.response.edit_message(embed=embed)
+            return await interaction.response.edit_message(embed=embed, view=view)
         await interaction.response.edit_message(view=view)
         
         
 class TicTacToe(discord.ui.View):
-    def __init__(self, two_player: bool = False):
+    def __init__(self, author: discord.User | discord.Member, second_player: discord.User | discord.Member):
         super().__init__()
         self.board = [
             [None, None, None], 
@@ -72,7 +84,9 @@ class TicTacToe(discord.ui.View):
             [None, None, None]
         ]
         self.current_player = "X"
-        self.two_player = two_player
+        self.author = author
+        self.second_player = second_player
+        self.two_player = True if second_player else False 
 
         for x in range(3):
             for y in range(3):
@@ -104,10 +118,11 @@ class TicTacToe(discord.ui.View):
     
     def update_button(self, x: int, y: int, state: str):
         for item in self.children:
-            if item.x == x and item.y == y: # type: ignore
-                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
-                item.label = state # type: ignore
-                item.disabled = True # type: ignore
+            assert isinstance(item, TicTacToeButton)
+            if item.x == x and item.y == y:
+                item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success
+                item.label = state
+                item.disabled = True
             
             
 
@@ -118,13 +133,13 @@ class Minigames(commands.Cog):
         self.bot = bot      
         
     @commands.command()
-    async def tic_tac_toe(self, ctx: XenoContext, two_player: bool = False):
+    async def tic_tac_toe(self, ctx: XenoContext, player: discord.User = None): # type: ignore
         embed = discord.Embed(
             title = "Tic Tac Toe", 
             description = "Get 3 in a row to win!", 
             color = discord.Colour.dark_blue()
         )
-        view = TicTacToe(True)
+        view = TicTacToe(ctx.author, player)
         await ctx.send(embed = embed, view=view)
         
         

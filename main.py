@@ -2,7 +2,7 @@ import os
 from asyncio import run
 from typing import Literal
 
-import discord  #
+import discord
 from discord.ext import commands
 
 from utils.bot import Xeno
@@ -10,7 +10,6 @@ from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
 
 bot = Xeno(intents=discord.Intents.all())
-
 
 @bot.event
 async def on_ready() -> None:
@@ -30,7 +29,9 @@ async def command_counter(ctx: XenoContext) -> None:
 
 
 @bot.check_once
-async def blacklist(ctx: XenoContext) -> Literal[True]:  # TODO: Check why this isn't working !!
+async def blacklist(
+    ctx: XenoContext,
+) -> Literal[True]:  # TODO: Check why this isn't working !!
     "A check that gets applied before commands to make sure a blacklisted user can't use commands."
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True

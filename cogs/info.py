@@ -64,7 +64,9 @@ class Information(commands.Cog):
 
     @commands.command(alias=["stats", "botinfo"])
     async def info(self, ctx: XenoContext) -> None:
-        """Tells you information about the bot itself."""
+        """
+        Tells you information about the bot itself.
+        """
 
         commits = "\n".join(self.format_commit(c) for c in self.get_commits())
         memory = self.process.memory_info().rss / 1024**2

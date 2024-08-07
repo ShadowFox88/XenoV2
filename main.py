@@ -32,7 +32,10 @@ async def command_counter(ctx: XenoContext) -> None:
 async def blacklist(
     ctx: XenoContext,
 ) -> Literal[True]:  # TODO: Check why this isn't working !!
-    "A check that gets applied before commands to make sure a blacklisted user can't use commands."
+    """
+    A check that gets applied before commands to make sure a blacklisted user can't use commands.
+    """
+
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True
     raise BlacklistedError
@@ -40,7 +43,10 @@ async def blacklist(
 
 @bot.check_once
 async def maintenance(ctx: XenoContext) -> Literal[True]:
-    "A check that gets applied before commands to make sure that the bot isn't in maintenance."
+    """
+    A check that gets applied before commands to make sure that the bot isn't in maintenance.
+    """
+    
     if not bot.maintenance or ctx.author.id in bot.owner_ids:
         return True
     raise MaintenanceError
@@ -48,7 +54,10 @@ async def maintenance(ctx: XenoContext) -> Literal[True]:
 
 @bot.check_once
 async def cooldown(ctx: XenoContext) -> Literal[True]:
-    "A check that gets applied before commands to make sure a user hasn't ran too many commands in X amount of time." 
+    """
+    A check that gets applied before commands to make sure a user hasn't ran too many commands in X amount of time.
+    """
+
     if (
         ctx.author.id in bot.owner_ids
         or isinstance(ctx.author, discord.User)

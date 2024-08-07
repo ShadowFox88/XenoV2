@@ -4,12 +4,24 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
+<<<<<<< HEAD
 CREATE TABLE IF NOT EXISTS entities (
+=======
+CREATE TABLE IF NOT EXISTS users (
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
     id BIGINT PRIMARY KEY,
     prefix varchar(10) NOT NULL default 'x-',
     type entity_type NOT NULL
 );
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 CREATE TABLE IF NOT EXISTS blacklist (
     id BIGINT REFERENCES entities(id) ON DELETE CASCADE,
     name text NOT NULL,
@@ -26,6 +38,13 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 -- thanks Leo: https://github.com/DuckBot-Discord/duck-hideout-manager-bot/blob/main/schema.sql
 DO $$
 BEGIN

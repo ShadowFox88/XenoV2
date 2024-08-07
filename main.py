@@ -4,14 +4,20 @@ from typing import Literal
 
 import discord
 from discord.ext import commands
+<<<<<<< HEAD
 from dotenv import load_dotenv
+=======
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 
 from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
 
+<<<<<<< HEAD
 load_dotenv()
 
+=======
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
 bot = Xeno(intents=discord.Intents.all())
 
 
@@ -29,7 +35,13 @@ async def command_counter(ctx: XenoContext) -> None:
 
 
 @bot.check_once
+<<<<<<< HEAD
 async def blacklist(ctx: XenoContext) -> Literal[True]: #TODO: Check why this isn't workingz
+=======
+async def blacklist(
+    ctx: XenoContext,
+) -> Literal[True]:  # TODO: Check why this isn't workingz
+>>>>>>> c16029a6b0d57be697520862db627724b9f44afb
     "A check that gets applied before commands to make sure a blacklisted user can't use commands."
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True

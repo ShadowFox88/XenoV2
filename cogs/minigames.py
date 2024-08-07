@@ -50,8 +50,7 @@ class TicTacToe(discord.ui.View):
                 item.style = discord.ButtonStyle.danger if state == "X" else discord.ButtonStyle.success # type: ignore
                 item.label = state # type: ignore
                 item.disabled = True # type: ignore
- # WHILE LOOP <------
-                # advay  🤪🍆🍆🍆🍑🍑🍑🍑🍑🥴🥴🍆🍆🍆🤪🤪💅💅💅💅💅
+                
                 
         
 
@@ -65,6 +64,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         assert self.view is not None
         view: TicTacToe = self.view
         state = view.board[self.x][self.y]
+        await interaction.response.send_message(view.children)
         
         if state is not None:
             return

@@ -22,9 +22,9 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         
         # Check if it's the player's turn
         if view.two_player:
-            if interaction.user.id != view.author.id and view.current_player == "X":
-                return await interaction.response.send_message(f"It's not your turn {interaction.user.mention}!", dephemeral=True)
-            elif interaction.user.id != view.second_player.id and view.current_player == "O":
+            if interaction.user.id != view.author.id and view.current_player == "X" and interaction.user.id in (view.author.id, view.second_player.id):
+                return await interaction.response.send_message(f"It's not your turn {interaction.user.mention}!", ephemeral=True)
+            elif interaction.user.id != view.second_player.id and view.current_player == "O" and interaction.user.id in (view.author.id, view.second_player.id):
                 return await interaction.response.send_message(f"It's not your turn {interaction.user.mention}!", ephemeral=True)
             elif interaction.user.id not in (view.author.id, view.second_player.id):
                 return await interaction.response.send_message(f"You aren't a player {interaction.user.mention}!", ephemeral=True)

@@ -14,6 +14,7 @@ class Developer(commands.Cog):
     async def developer_group(self, ctx: XenoContext):
         await ctx.send_help(ctx.command)
         
+    @commands.is_owner()
     @developer_group.command()
     async def reload(self, ctx: XenoContext, extension: str = "all"):
         if extension == "all":
@@ -38,7 +39,7 @@ class Developer(commands.Cog):
                     
             embed = discord.Embed(title="Reloaded Extensions")
             embed.colour = discord.Colour.green() if all(extensions.values()) else discord.Colour.red()
-            embed.add_field(name="Extensions", value="\n".join(f"{k}: {'<:AnimatedGreenTick:789586504950874132>' if v else '<:AnimatedRedCross:789586505974022164>'}" for k, v in extensions.items()))
+            embed.add_field(name="Extensions", value="\n".join(f"{self.bot.emoji_list['animated_green_tick'] if v else self.bot.emoji_list['animated_red_cross']} {k}" for k, v in extensions.items()))
             
         await ctx.send(embed=embed, button=True)
         

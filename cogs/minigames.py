@@ -12,7 +12,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         self.x: int = x
         self.y: int = y
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         assert self.view is not None
         view: TicTacToe = self.view
         state = view.board[self.x][self.y]

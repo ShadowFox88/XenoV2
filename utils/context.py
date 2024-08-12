@@ -59,8 +59,8 @@ class XenoContext(commands.Context["Xeno"]):
         timeout: int = 60,
         delete_message_after: bool = False,
         remove_view_after: bool = True,
-        no_reply: bool = False,
-        ephemeral: bool = False,
+        no_reply: bool = True,
+        ephemeral: bool = True,
         **kwargs: Any,
     ) -> bool | None:
         if delete_message_after and remove_view_after:
@@ -79,7 +79,7 @@ class XenoContext(commands.Context["Xeno"]):
         msg = await self.send(
             content=message,
             embed=embed,
-            no_reply=no_reply,
+            reply=no_reply,
             ephemeral=ephemeral,
             view=view,
             **kwargs,

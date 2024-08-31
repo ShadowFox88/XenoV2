@@ -34,8 +34,14 @@ class Xeno(commands.AutoShardedBot):
         self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames"]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
-        discord.utils.setup_logging(handler=logging.FileHandler("bot.log"))
+        dt_fmt = '%Y-%m-%d %H:%M:%S'
+        formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+        file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
+        file_handler.setFormatter(formatter)
+        discord.utils.setup_logging(handler=file_handler)
         self.logger: logging.Logger = logging.getLogger("discord")
+        self.logger.setLevel(logging.DEBUG)
+        logging.getLogger("discord.http").setLevel(logging.DEBUG)
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)

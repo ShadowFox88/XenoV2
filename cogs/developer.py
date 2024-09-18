@@ -90,7 +90,7 @@ class Developer(commands.Cog):
             message_statistics = {}
             
             for i in deleted_messages:
-                if i.author.id not in message_statistics:
+                if i.author not in message_statistics:
                     message_statistics[i.author] = 0
                 message_statistics[i.author] += 1
                 
@@ -114,7 +114,7 @@ class Developer(commands.Cog):
             message_statistics = {}
                 
             for i in deleted_messages:
-                if i.author.id not in message_statistics:
+                if i.author not in message_statistics:
                     message_statistics[i.author] = 0
                 message_statistics[i.author] += 1
                     

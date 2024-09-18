@@ -45,18 +45,12 @@ class Developer(commands.Cog):
         
     @commands.is_owner()
     @developer_group.command()
-    async def purge_messages(self, ctx: XenoContext, target: Union[discord.Member, discord.User, int], manual_delete: bool = False):
+    async def purge_messages(self, ctx: XenoContext, target: Union[discord.Member, discord.User] = None, limit: int = 50, manual_delete: bool = False):
         
         embed = discord.Embed(title="Purged Messages")
-        
-        if not isinstance(target, int):
-            target = await self.bot.fetch_user(target)
             
         if not manual_delete:
-            if isinstance(target, int):
-                deleted_messages = await ctx.channel.purge(limit=int, check=lambda: m != ctx.message)
-            else:
-                deleted_messages = await ctx.channel.purge(limit=50, check=lambda m: m.author == target and m != ctx.message)
+                deleted_messages = await ctx.channel.purge(limit=limit, check=lambda m: m.author == target and m != ctx.message)
             
             embed.title = "Purged Messages Successfully"
             embed.colour = discord.Colour.green()
@@ -73,8 +67,7 @@ class Developer(commands.Cog):
             
             return await ctx.reply(embed=embed)
             
-            
-        limit = 50 if not isinstance(target, int) else target
+        
         deleted_messages = []
         
         for i in ctx.channel.history(limit=limit):

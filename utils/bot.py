@@ -26,7 +26,7 @@ class Xeno(commands.AutoShardedBot):
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()
         self.maintenance: bool = False
-        self.owner_ids: List[int] = [606648465065246750, 738662726179487764, 811527737881002024]  # type: ignore
+        self.owner_ids: List[int] = [606648465065246750] #, 738662726179487764, 811527737881002024]  # type: ignore
         self.owners: List[discord.User] | List[None] = []
         self.blacklisted: List[int] = []
         self.support_server: str = ""

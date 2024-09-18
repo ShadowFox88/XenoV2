@@ -31,7 +31,7 @@ class Xeno(commands.AutoShardedBot):
         self.blacklisted: List[int] = []
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
-        self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames"]
+        self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames", "cogs.developer", "cogs.lime_and_friends"]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         dt_fmt = '%Y-%m-%d %H:%M:%S'

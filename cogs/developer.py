@@ -73,6 +73,8 @@ class Developer(commands.Cog):
         elif isinstance(arg3, bool):
             manual_delete = arg3
             
+        limit = limit + 1 # To include the command message
+            
         embed = discord.Embed(title="Purged Messages")
         
         def check(message: discord.Message):

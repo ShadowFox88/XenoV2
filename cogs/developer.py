@@ -43,17 +43,43 @@ class Developer(commands.Cog):
             
         await ctx.send(embed=embed, button=True)
         
+        
     @commands.is_owner()
     @developer_group.command()
-    async def purge_messages(self, ctx: XenoContext, *, target: Union[discord.Member, discord.User] = None, limit: int = 50, manual_delete: bool = False):
+    async def purge_messages(self, ctx: XenoContext, arg1: Union[discord.Member, discord.User, discord.Role, int, bool] = None, arg2: Union[discord.Member, discord.User, int, bool] = None, arg3: Union[discord.Member, discord.User, int, bool] = None):
         
+        target = None
+        limit = 50
+        manual_delete = False
+        
+        if isinstance(arg1, discord.Member) or isinstance(arg1, discord.User):
+            target = arg1
+        elif isinstance(arg2, discord.Member) or isinstance(arg2, discord.User):
+            target = arg2
+        elif isinstance(arg3, discord.Member) or isinstance(arg3, discord.User):
+            target = arg3
+            
+        if isinstance(arg1, int):
+            limit = arg1
+        elif isinstance(arg2, int):
+            limit = arg2
+        elif isinstance(arg3, int):
+            limit = arg3
+        
+        if isinstance(arg1, bool):
+            manual_delete = arg1
+        elif isinstance(arg2, bool):
+            manual_delete = arg2
+        elif isinstance(arg3, bool):
+            manual_delete = arg3
+            
         embed = discord.Embed(title="Purged Messages")
         
         def check(message: discord.Message):
             if target is None:
                 return message != ctx.message
             return message.author == target and message != ctx.message
-            
+        
         if not manual_delete:
             deleted_messages = await ctx.channel.purge(limit=limit, check=check)
             
@@ -71,38 +97,30 @@ class Developer(commands.Cog):
             embed.add_field(name="Messages Deleted", value="\n".join([f"**{i}**: {j}" for i, j in message_statistics.items()]))
             
             return await ctx.reply(embed=embed)
-            
         
-        deleted_messages = []
+        else:
+            deleted_messages = []
         
-        for i in ctx.channel.history(limit=limit):
-            if i == ctx.message:
-                continue
-            deleted_messages.append(i)
-            await i.delete()
-            
-            
-        embed.title = "Purged Messages Successfully"
-        embed.colour = discord.Colour.green()
-        await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
-            
-        message_statistics = {}
-            
-        for i in deleted_messages:
-            if i.author.id not in message_statistics:
-                message_statistics[i.author] = 0
-            message_statistics[i.author] += 1
+            for i in ctx.channel.history(limit=limit):
+                if i == ctx.message:
+                    continue
+                deleted_messages.append(i)
+                await i.delete()
                 
-        embed.add_field(name="Messages Deleted", value="\n".join([f"**{i}**: {j}" for i, j in message_statistics.items()]))
-            
-        return await ctx.reply(embed=embed)
-            
-            
-        
-
-
-    
-    
+            embed.title = "Purged Messages Successfully"
+            embed.colour = discord.Colour.green()
+            await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
+                
+            message_statistics = {}
+                
+            for i in deleted_messages:
+                if i.author.id not in message_statistics:
+                    message_statistics[i.author] = 0
+                message_statistics[i.author] += 1
+                    
+            embed.add_field(name="Messages Deleted", value="\n".join([f"**{i}**: {j}" for i, j in message_statistics.items()]))
+                
+            return await ctx.reply(embed=embed)
     
 async def setup(bot: Xeno):
     cog = Developer(bot)

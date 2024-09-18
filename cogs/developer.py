@@ -45,7 +45,7 @@ class Developer(commands.Cog):
         
         
     @commands.is_owner()
-    @developer_group.command()
+    @developer_group.command(aliases=["purge"])
     async def purge_messages(self, ctx: XenoContext, arg1: Union[discord.Member, discord.User, discord.Role, int, bool] = None, arg2: Union[discord.Member, discord.User, int, bool] = None, arg3: Union[discord.Member, discord.User, int, bool] = None):
         
         target = None

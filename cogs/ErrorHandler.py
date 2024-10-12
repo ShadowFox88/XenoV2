@@ -64,11 +64,11 @@ class ErrorHandler(commands.Cog):
         embed.add_field(
             name="An unexpected error occurred while running this command, my developers are aware.",
             value=f"```py{''.join(traceback.format_exception(error))}```",
-            footer = f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
         )
+        embed.footer = f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
+
         emoji = self.bot.emoji_list["animated_red_cross"]
         await ctx.message.add_reaction(emoji)
-        
         await ctx.send(embed=embed, reply=True, delete_after=30)
         
         self.bot.logger.exception(error, extra = {"error": "unexpected"})

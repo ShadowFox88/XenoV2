@@ -57,7 +57,8 @@ class ErrorHandler(commands.Cog):
             guild_id = None
         
         await self.bot.db.execute("INSERT INTO errors (command, user_id, guild_id, traceback) VALUES ($1, $2, $3, $4)", ctx.message.content, ctx.author.id, guild_id, ''.join(traceback.format_exception(error)))
-        error_id = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
+        data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
+        error_id = data[0]["id"]
         
         embed = discord.Embed(colour=discord.Color.red())
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
@@ -65,7 +66,7 @@ class ErrorHandler(commands.Cog):
             name="An unexpected error occurred while running this command, my developers are aware.",
             value=f"```py{''.join(traceback.format_exception(error))}```",
         )
-        embed.set_footer(f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}")
+        embed.set_footer(text=f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}")
 
         emoji = self.bot.emoji_list["animated_red_cross"]
         await ctx.message.add_reaction(emoji)

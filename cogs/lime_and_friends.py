@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from utils.bot import Xeno
+from utils.context import XenoContext
 
 class Lime_And_Friends(commands.Cog):
     def __init__(self, bot: Xeno):
@@ -8,7 +9,7 @@ class Lime_And_Friends(commands.Cog):
 
     
     @commands.command()
-    async def unpin(self, ctx, message_id: int | None) -> None:
+    async def unpin(self, ctx: XenoContext, message_id: int | None) -> None:
         assert not (message_id and ctx.message.reference)
         assert ctx.guild.id == 1265697842475831397
         
@@ -28,7 +29,7 @@ class Lime_And_Friends(commands.Cog):
         await message.unpin()
 
     @commands.command()
-    async def pin(self, ctx, message_id: int | None) -> None:
+    async def pin(self, ctx: XenoContext, message_id: int | None) -> None:
         assert not (message_id and ctx.message.reference)
         assert ctx.guild.id == 1265697842475831397
         if message_id:

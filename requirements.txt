@@ -10,3 +10,4 @@ typing_extensions
 gitpython
 psutil
 humanfriendly
+python-logging-loki

@@ -1,5 +1,7 @@
 import datetime
 import logging
+import logging_loki
+from multiprocessing import Queue
 import os
 import re
 from typing import Any, List
@@ -34,6 +36,17 @@ class Xeno(commands.AutoShardedBot):
         self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames", "cogs.developer", "cogs.lime_and_friends"]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
+        queue = Queue(-1)
+        handler = logging.handlers.QueueHandler(queue)
+        handler_loki = logging_loki.LokiHandler(
+            url=os.environ["LOKI_URL"], 
+            tags={"application": "XenoV2"},
+            auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
+            version="1",
+        )
+        logging.handlers.QueueListener(queue, handler_loki).start()
+        
+        
         dt_fmt = '%Y-%m-%d %H:%M:%S'
         formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
         file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
@@ -42,6 +55,7 @@ class Xeno(commands.AutoShardedBot):
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
         logging.getLogger("discord.http").setLevel(logging.INFO)
+        logging.addHandler(handler)
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)

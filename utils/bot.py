@@ -12,8 +12,6 @@ import discord
 from discord.ext import commands
 
 from utils.context import XenoContext
-from utils.statements import PreparedStatements
-
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):

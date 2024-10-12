@@ -55,7 +55,7 @@ class Xeno(commands.AutoShardedBot):
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
         logging.getLogger("discord.http").setLevel(logging.INFO)
-        logging.addHandler(handler)
+        self.logger.addHandler(handler)
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)

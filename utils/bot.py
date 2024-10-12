@@ -113,6 +113,8 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
+                
+        await self.setup_prepared_statements()
 
     def get_error_webhook(self):
         return discord.Webhook.from_url(

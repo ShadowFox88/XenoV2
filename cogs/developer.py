@@ -128,7 +128,7 @@ class Developer(commands.Cog):
     
     @developer_group.command(aliases=["e", "error"])
     async def error(self, ctx: XenoContext, id: int):
-        ...
+        ... # "SELECT * FROM errors WHERE id = $1"
     
 async def setup(bot: Xeno):
     cog = Developer(bot)

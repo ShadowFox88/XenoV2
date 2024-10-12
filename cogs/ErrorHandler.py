@@ -50,9 +50,9 @@ class ErrorHandler(commands.Cog):
             
             self.bot.logger.exception(error, extra = {"error": label})
             return
-
-        await self.bot.statements.error_insertion(ctx.command, ctx.user.id, ctx.guild.id, ''.join(traceback.format_exception(error)))
-        error_id = await self.bot.statements.get_last_error_id()
+        
+        await self.bot.db.execute("INSERT INTO errors (command, user_id, guild_id, traceback) VALUES ($1, $2, $3, $4)", ctx.command, ctx.user.id, ctx.guild.id, ''.join(traceback.format_exception(error)))
+        error_id = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         
         embed = discord.Embed(colour=discord.Color.red())
         embed.timestamp = embed.timestamp or discord.utils.utcnow()

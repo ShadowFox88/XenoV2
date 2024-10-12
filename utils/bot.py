@@ -71,10 +71,6 @@ class Xeno(commands.AutoShardedBot):
 
     async def get_prefix(self, message: discord.Message):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
-    
-    async def setup_prepared_statements(self):
-        self.statements = PreparedStatements(self.db)
-        await self.statements.setup()
 
     async def setup_hook(self):
         self.db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(
@@ -113,8 +109,6 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
-                
-        await self.setup_prepared_statements()
 
     def get_error_webhook(self):
         return discord.Webhook.from_url(

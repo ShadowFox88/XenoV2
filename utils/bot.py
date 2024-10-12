@@ -36,6 +36,8 @@ class Xeno(commands.AutoShardedBot):
         self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames", "cogs.developer", "cogs.lime_and_friends"]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
+        logging_loki.emitter.LokiEmitter.level_tag = "level"
+        
         queue = Queue(-1)
         handler = logging.handlers.QueueHandler(queue)
         handler_loki = logging_loki.LokiHandler(
@@ -46,16 +48,17 @@ class Xeno(commands.AutoShardedBot):
         )
         logging.handlers.QueueListener(queue, handler_loki).start()
         
-        
         dt_fmt = '%Y-%m-%d %H:%M:%S'
         formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
         file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
         file_handler.setFormatter(formatter)
+        
         discord.utils.setup_logging(handler=file_handler)
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
-        logging.getLogger("discord.http").setLevel(logging.INFO)
         self.logger.addHandler(handler)
+        logging.getLogger("discord.http").setLevel(logging.INFO)
+        
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)

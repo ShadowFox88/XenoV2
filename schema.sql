@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS errors (
     id SERIAL PRIMARY KEY,
     command text NOT NULL,
     user_id BIGINT NOT NULL,
-    guild_id BIGINT NOT NULL,
+    guild_id BIGINT,
     traceback text NOT NULL,
     error_time timestamp with time zone NOT NULL default now()
 );

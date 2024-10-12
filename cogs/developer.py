@@ -126,7 +126,7 @@ class Developer(commands.Cog):
                 
             return await ctx.reply(embed=embed)
     
-    @developer_group.command(aliases=["e", "error"])
+    @developer_group.command(aliases=["e"])
     async def error(self, ctx: XenoContext, id: int):
         ... # "SELECT * FROM errors WHERE id = $1"
     

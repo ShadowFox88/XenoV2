@@ -8,13 +8,16 @@ from utils.context import XenoContext
 class Developer(commands.Cog):
     def __init__(self, bot: Xeno):
         self.bot = bot
-
-    @commands.is_owner()
+    
+    async def cog_check(self, ctx):
+        return await self.bot.is_owner(ctx.author)
+    
+    
     @commands.group(name="developer", aliases=["dev"], invoke_without_command=True)
     async def developer_group(self, ctx: XenoContext):
         await ctx.send_help(ctx.command)
         
-    @commands.is_owner()
+        
     @developer_group.command()
     async def reload(self, ctx: XenoContext, extension: str = "all"):
         if extension == "all":
@@ -28,7 +31,7 @@ class Developer(commands.Cog):
                     try:
                         await self.bot.reload_extension(ext)
                         extensions[ext] = True
-                    except:
+                    except Exception:
                         pass
             else:
                 try:
@@ -44,7 +47,6 @@ class Developer(commands.Cog):
         await ctx.send(embed=embed, button=True)
         
         
-    @commands.is_owner()
     @developer_group.command(aliases=["purge"])
     async def purge_messages(self, ctx: XenoContext, arg1: Union[discord.Member, discord.User, discord.Role, int, bool] = None, arg2: Union[discord.Member, discord.User, int, bool] = None, arg3: Union[discord.Member, discord.User, int, bool] = None):
         
@@ -123,6 +125,10 @@ class Developer(commands.Cog):
             embed.add_field(name="Messages Deleted", value="\n".join([f"**{i}**: {j}" for i, j in message_statistics.items()]))
                 
             return await ctx.reply(embed=embed)
+    
+    @developer_group.command(aliases=["e", "error"])
+    async def error(self, ctx: XenoContext, id: int):
+        ...
     
 async def setup(bot: Xeno):
     cog = Developer(bot)

@@ -12,6 +12,7 @@ import discord
 from discord.ext import commands
 
 from utils.context import XenoContext
+from utils.statements import PreparedStatements
 
 
 class Xeno(commands.AutoShardedBot):
@@ -72,8 +73,8 @@ class Xeno(commands.AutoShardedBot):
         return commands.when_mentioned_or(*["x-", "=="])(self, message)
     
     async def setup_prepared_statements(self):
-        self.error_insertion = await self.db.prepare("""INSERT INTO errors (command, user_id, guild_id, traceback) VALUES ($1, $2, $3, $4)""")
-        self.get_last_error_id = await self.db.prepare("""SELECT id FROM errors ORDER BY id DESC LIMIT 1""")
+        self.statements = PreparedStatements(self.db)
+        await self.statements.setup()
 
     async def setup_hook(self):
         self.db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(

@@ -65,7 +65,7 @@ class ErrorHandler(commands.Cog):
             name="An unexpected error occurred while running this command, my developers are aware.",
             value=f"```py{''.join(traceback.format_exception(error))}```",
         )
-        embed.footer = f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
+        embed.set_footer(f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}")
 
         emoji = self.bot.emoji_list["animated_red_cross"]
         await ctx.message.add_reaction(emoji)

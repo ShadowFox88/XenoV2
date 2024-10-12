@@ -40,3 +40,12 @@ CREATE TABLE IF NOT EXISTS user_channels (
     channel_type channel_type NOT NULL,
     archive_mode archive_mode
 )
+
+CREATE TABLE IF NOT EXISTS errors (
+    id SERIAL PRIMARY KEY,
+    command text NOT NULL,
+    user_id BIGINT NOT NULL,
+    guild_id BIGINT NOT NULL,
+    traceback text NOT NULL,
+    error_time timestamp with time zone NOT NULL default now()
+)

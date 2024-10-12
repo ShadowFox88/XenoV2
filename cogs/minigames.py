@@ -47,7 +47,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             view.current_player = "X"
             
         winner = view.check_winner()
-        if winner != None:
+        if winner is not None:
             view.stop()
 
             if winner == "Tie":
@@ -81,7 +81,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 view.current_player = "X"
                 
         winner = view.check_winner()
-        if winner != None:
+        if winner is not None:
             view.stop()
 
             if winner == "Tie":

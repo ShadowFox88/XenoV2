@@ -76,16 +76,7 @@ class Xeno(commands.AutoShardedBot):
             user=os.environ["DATABASE_USER"],
             password=os.environ["DATABASE_PASSWORD"],
             database=os.environ["DATABASE"],
-        )
-        if os.environ["TEST_BOT"]:
-            self.real_db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(
-                host=os.environ["DATABASE_HOST"],
-                user=os.environ["DATABASE_USER"],
-                password=os.environ["DATABASE_PASSWORD"],
-                database=os.environ["DATABASE"],
-            )
-            
-            
+        )   
 
         if not self.db:
             raise RuntimeError("Couldn't connect to database!")

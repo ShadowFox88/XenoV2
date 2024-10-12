@@ -60,12 +60,8 @@ class ErrorHandler(commands.Cog):
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         error_id = data[0]["id"]
         
-        embed = discord.Embed(colour=discord.Color.red())
+        embed = discord.Embed(colour=discord.Color.red(), name="An unexpected error occurred while running this command, my developers are aware.", description=f"```py{''.join(traceback.format_exception(error))}```")
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
-        embed.add_field(
-            name="An unexpected error occurred while running this command, my developers are aware.",
-            value=f"```py{''.join(traceback.format_exception(error))}```",
-        )
         embed.set_footer(text=f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}")
 
         emoji = self.bot.emoji_list["animated_red_cross"]

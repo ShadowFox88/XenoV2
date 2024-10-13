@@ -11,6 +11,7 @@ from utils.errors import BlacklistedError, MaintenanceError
 
 bot = Xeno(intents=discord.Intents.all())
 
+
 @bot.event
 async def on_ready() -> None:
     bot.owners = [
@@ -46,7 +47,7 @@ async def maintenance(ctx: XenoContext) -> Literal[True]:
     """
     A check that gets applied before commands to make sure that the bot isn't in maintenance.
     """
-    
+
     if not bot.maintenance or ctx.author.id in bot.owner_ids:
         return True
     raise MaintenanceError

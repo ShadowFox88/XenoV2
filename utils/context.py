@@ -16,7 +16,7 @@ class XenoContext(commands.Context["Xeno"]):
         content: str | None = None,
         button: bool = False,
         reply: bool = False,
-        **kwargs: Any,                                                                  
+        **kwargs: Any,
     ):
         embeds = kwargs.get("embeds", [])
         for embed in embeds:

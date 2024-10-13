@@ -15,11 +15,11 @@ class Tasks(commands.Cog):
         await self.bot.db.execute(
             "UPDATE blacklist SET blacklist_active = false WHERE blacklist_active = true AND blacklist_expiry < NOW()"
         )
-        
+
         record = await self.bot.db.fetch(
             "SELECT id FROM blacklist WHERE blacklist_active = true"
         )
-        
+
         self.bot.blacklisted.clear()
 
         for i in record:

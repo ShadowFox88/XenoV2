@@ -1,17 +1,18 @@
 import datetime
 import logging
-import logging_loki
-from multiprocessing import Queue
 import os
 import re
+from multiprocessing import Queue
 from typing import Any, List
 
 import aiohttp
 import asyncpg
 import discord
+import logging_loki
 from discord.ext import commands
 
 from utils.context import XenoContext
+
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -27,37 +28,48 @@ class Xeno(commands.AutoShardedBot):
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()
         self.maintenance: bool = False
-        self.owner_ids: List[int] = [606648465065246750] #, 738662726179487764, 811527737881002024]  # type: ignore
+        self.owner_ids: List[int] = [
+            606648465065246750
+        ]  # , 738662726179487764, 811527737881002024]  # type: ignore
         self.owners: List[discord.User] | List[None] = []
         self.blacklisted: List[int] = []
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
-        self.DEFAULT_EXTENSIONS: List[str] = ["cogs.info", "cogs.tasks", "cogs.ErrorHandler", "cogs.minigames", "cogs.developer", "cogs.lime_and_friends"]
+        self.DEFAULT_EXTENSIONS: List[str] = [
+            "cogs.info",
+            "cogs.tasks",
+            "cogs.ErrorHandler",
+            "cogs.minigames",
+            "cogs.developer",
+            "cogs.lime_and_friends",
+        ]
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         logging_loki.emitter.LokiEmitter.level_tag = "level"
-        
+
         queue = Queue(-1)
         handler = logging.handlers.QueueHandler(queue)
         handler_loki = logging_loki.LokiHandler(
-            url=os.environ["LOKI_URL"], 
+            url=os.environ["LOKI_URL"],
             tags={"application": "XenoV2"},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
         logging.handlers.QueueListener(queue, handler_loki).start()
-        
-        dt_fmt = '%Y-%m-%d %H:%M:%S'
-        formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+
+        dt_fmt = "%Y-%m-%d %H:%M:%S"
+        formatter = logging.Formatter(
+            "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
+        )
         file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
         file_handler.setFormatter(formatter)
-        
+
         discord.utils.setup_logging(handler=file_handler)
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(handler)
         logging.getLogger("discord.http").setLevel(logging.INFO)
-        
+
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.token = token
         await super().start(token)
@@ -76,7 +88,7 @@ class Xeno(commands.AutoShardedBot):
             user=os.environ["DATABASE_USER"],
             password=os.environ["DATABASE_PASSWORD"],
             database=os.environ["DATABASE"],
-        )   
+        )
 
         if not self.db:
             raise RuntimeError("Couldn't connect to database!")

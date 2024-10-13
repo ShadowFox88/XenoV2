@@ -119,8 +119,7 @@ class ErrorHandler(commands.Cog):
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
-        webhook_message = await webhook.send(embed=developer_embed, wait=True)
-        message = webhook_message.fetch()
+        message = await webhook.send(embed=developer_embed, wait=True)
         
         await self.bot.db.execute(
             "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4)",

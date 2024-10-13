@@ -133,7 +133,7 @@ class Developer(commands.Cog):
     async def error(self, ctx: XenoContext, id: int):
         ... # "SELECT * FROM errors WHERE id = $1"
         
-    @developer_group.command()
+    @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str):
         
         cross: str = self.bot.emoji_list["animated_red_cross"]
@@ -144,8 +144,7 @@ class Developer(commands.Cog):
         if len(matches) == 0:
             await ctx.message.add_reaction(cross)
             
-            embed = discord.Embed(colour=discord.Colour.red())
-            embed.add_field(name="No Matches Found")
+            embed = discord.Embed(colour=discord.Colour.red(), description="No Matches Found")
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
             exec(f"raise {matches[0]}")

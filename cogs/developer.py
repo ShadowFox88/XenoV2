@@ -4,6 +4,9 @@ from typing import Dict, Union
 
 from utils.bot import Xeno
 from utils.context import XenoContext
+from utils.errors import DiscordExceptions
+
+import difflib
 
 class Developer(commands.Cog):
     def __init__(self, bot: Xeno):
@@ -129,7 +132,32 @@ class Developer(commands.Cog):
     @developer_group.command(aliases=["e"])
     async def error(self, ctx: XenoContext, id: int):
         ... # "SELECT * FROM errors WHERE id = $1"
-    
+        
+    @developer_group.command()
+    async def raise_error(self, ctx: XenoContext, error: str):
+        
+        cross: str = self.bot.emoji_list["animated_red_cross"]
+        tick: str = self.bot.emoji_list["animated_green_tick"]
+        
+        matches = difflib.get_close_matches(error, DiscordExceptions().all_errors)
+        
+        if len(matches) == 0:
+            await ctx.message.add_reaction(cross)
+            
+            embed = discord.Embed(colour=discord.Colour.red())
+            embed.add_field(name="No Matches Found")
+        elif len(matches) == 1:
+            await ctx.message.add_reaction(tick)
+            exec(f"raise {matches[0]}")
+        else:
+            await ctx.message.add_reaction(cross)
+            
+            embed = discord.Embed(colour=discord.Colour.red())
+            embed.add_field(name="Multiple Matches Found", value=", ".join([f"`{i}`" for i in matches]))
+            
+        
+        
+        
 async def setup(bot: Xeno):
     cog = Developer(bot)
     await bot.add_cog(cog)

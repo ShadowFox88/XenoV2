@@ -1,4 +1,5 @@
 import difflib
+import time
 from typing import Dict, Union
 
 import discord
@@ -163,7 +164,7 @@ class Developer(commands.Cog):
         user_id = data[0]["user_id"]
         command = data[0]["command"]
         guild_id = data[0]["guild_id"]
-        error_time = data[0]["error_time"]
+        error_time = time.mktime(data[0]["error_time"].timetuple())
 
         embed = discord.Embed(
             title=f"Error Report: {id}",

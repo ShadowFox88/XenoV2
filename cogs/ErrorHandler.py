@@ -122,7 +122,7 @@ class ErrorHandler(commands.Cog):
         message = await webhook.send(embed=developer_embed, wait=True)
         
         await self.bot.db.execute(
-            "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4)",
+            "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4, $5)",
             ctx.message.content,
             ctx.author.id,
             guild_id,

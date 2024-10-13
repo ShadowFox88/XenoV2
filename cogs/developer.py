@@ -170,7 +170,10 @@ class Developer(commands.Cog):
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
-        developer_message = await webhook.fetch_message(message_id)
+        try:
+            developer_message = await webhook.fetch_message(message_id)
+        except discord.errors.NotFound:
+            developer_message = None
 
         embed = discord.Embed(
             title=f"Error Report: {id}",

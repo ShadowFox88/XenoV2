@@ -83,7 +83,7 @@ class ErrorHandler(commands.Cog):
 
         
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
-        error_id = data[0]["id"]
+        error_id = data[0]["id"] + 1
 
         embed = discord.Embed(
             colour=discord.Color.red(),

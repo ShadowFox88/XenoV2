@@ -50,3 +50,5 @@ CREATE TABLE IF NOT EXISTS errors (
     error_time timestamp with time zone NOT NULL default now(),
     developer_message_id BIGINT
 );
+
+INSERT INTO errors (id, command, user_id, guild_id, traceback, developer_message_id, error_time) VALUES (1, 'test', 606648465065246750, 748192070748864554, 'Test', 0, '2000-01-01 00:00:00+00') ON CONFLICT DO NOTHING;

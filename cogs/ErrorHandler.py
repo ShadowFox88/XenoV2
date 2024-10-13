@@ -16,6 +16,7 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
     commands.TooManyArguments: ("You have provided too many arguments for this command!", "too_many_arguments"),
     commands.BadArgument: ("You have provided an invalid argument for this command!", "bad_argument"),
     commands.BotMissingPermissions: ("I am missing the necessary permissions to run this command!", "missing_permissions"),
+    commands.MissingRequiredArgument: ("You are missing a required argument for this command!", "missing_argument"),
 }
 
 ignoredErrors: Tuple[Exception] = (
@@ -67,6 +68,21 @@ class ErrorHandler(commands.Cog):
         emoji = self.bot.emoji_list["animated_red_cross"]
         await ctx.message.add_reaction(emoji)
         await ctx.send(embed=embed, reply=True, delete_after=30)
+        
+        developer_embed = discord.Embed(colour=discord.Color.red(), title=f"Error Report: {error_id}")
+        developer_embed.timestamp = developer_embed.timestamp or discord.utils.utcnow()
+        
+        developer_embed.add_field(name="Exception", value=f"```py\n{''.join(traceback.format_exception_only(error))}```")
+        
+        additional_info = f"""Error ID: {error_id}
+        Command: {ctx.message.content}
+        User: {ctx.author.mention} ({ctx.author.id})
+        Guild ID: {ctx.guild.id if ctx.guild else None}"""
+        
+        developer_embed.add_field(name="Additional Information", value=additional_info)
+        
+        webhook = discord.Webhook.from_url(self.bot.error_webhook, session=self.bot.session)
+        await webhook.send(embed=developer_embed)
         
         self.bot.logger.exception(error, extra = {"error": "unexpected"})
 

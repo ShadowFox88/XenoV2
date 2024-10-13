@@ -1,6 +1,8 @@
 import discord
+from typing import TYPE_CHECKING
 
-from utils.bot import Xeno
+if TYPE_CHECKING:
+    from utils.bot import Xeno
 
 
 class DeleteView(discord.ui.View):

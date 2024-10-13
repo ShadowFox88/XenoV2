@@ -89,11 +89,12 @@ class ConfirmView(discord.ui.View):
 
 
 class DismissView(discord.ui.View):
-    def __init__(self, error_id: int, author: discord.Member | discord.User, bot):
+    def __init__(self, error_id: int, author: discord.Member | discord.User, bot, developer_message: discord.WebhookMessage):
         super().__init__(timeout=None)
         self.author = author
         self.error_id = error_id
         self.bot = bot
+        self.developer_message = developer_message
 
     async def on_timeout(self) -> None:
         await self.message.edit(view=None)
@@ -107,6 +108,12 @@ class DismissView(discord.ui.View):
         if interaction.user.id == 606648465065246750:
             await self.bot.db.execute("DELETE FROM errors WHERE id = $1", self.error_id)
             await interaction.message.delete()
+            await interaction.response.send_message(
+                f"Error {self.error_id} has been dismissed!",
+                ephemeral=True,
+            )
+            await self.developer_message.delete()
+            
             self.stop()
             return
         await interaction.response.send_message(

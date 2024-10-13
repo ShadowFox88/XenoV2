@@ -47,5 +47,6 @@ CREATE TABLE IF NOT EXISTS errors (
     user_id BIGINT NOT NULL,
     guild_id BIGINT,
     traceback text NOT NULL,
-    error_time timestamp with time zone NOT NULL default now()
+    error_time timestamp with time zone NOT NULL default now(),
+    developer_message_id BIGINT
 );

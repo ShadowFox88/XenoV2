@@ -159,12 +159,18 @@ class Developer(commands.Cog):
 
     @developer_group.command(aliases=["e"])
     async def error(self, ctx: XenoContext, id: int):
-        data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id)
+        data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id) # TODO: Make the error handler store the message ID of the webhook it sends, and delete it when fixed.
         traceback = data[0]["traceback"]
         user_id = data[0]["user_id"]
         command = data[0]["command"]
         guild_id = data[0]["guild_id"]
+        message_id = data[0]["developer_message_id"]
         error_time = time.mktime(data[0]["error_time"].timetuple())
+        
+        webhook = discord.Webhook.from_url(
+            self.bot.error_webhook, session=self.bot.session
+        )
+        developer_message = await webhook.fetch_message(message_id)
 
         embed = discord.Embed(
             title=f"Error Report: {id}",
@@ -180,7 +186,7 @@ class Developer(commands.Cog):
         embed.add_field(name="Additional Info", value=additional_info)
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
 
-        await ctx.send(embed=embed, view=DismissView(id, ctx.author, self.bot))
+        await ctx.send(embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message))
 
     @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str):

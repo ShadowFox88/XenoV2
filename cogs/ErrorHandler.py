@@ -81,13 +81,7 @@ class ErrorHandler(commands.Cog):
         else:
             guild_id = None
 
-        await self.bot.db.execute(
-            "INSERT INTO errors (command, user_id, guild_id, traceback) VALUES ($1, $2, $3, $4)",
-            ctx.message.content,
-            ctx.author.id,
-            guild_id,
-            "".join(traceback.format_exception(error)),
-        )
+        
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         error_id = data[0]["id"]
 
@@ -125,7 +119,17 @@ class ErrorHandler(commands.Cog):
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
-        await webhook.send(embed=developer_embed)
+        webhook_message = await webhook.send(embed=developer_embed, wait=True)
+        message = webhook_message.fetch()
+        
+        await self.bot.db.execute(
+            "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4)",
+            ctx.message.content,
+            ctx.author.id,
+            guild_id,
+            "".join(traceback.format_exception(error)),
+            message.id
+        )
 
         self.bot.logger.exception(error, extra={"error": "unexpected"})
 

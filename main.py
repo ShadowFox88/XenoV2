@@ -79,6 +79,12 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
     return True
 
+@bot.listener()
+async def on_message_edit(self, before, after):
+    if before.content == after.content:
+        return
+    await self.bot.process_commands(after)
+
 
 async def main() -> None:
     async with bot:

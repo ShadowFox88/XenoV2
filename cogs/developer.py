@@ -141,6 +141,9 @@ class Developer(commands.Cog):
         
         matches = difflib.get_close_matches(error, DiscordExceptions().all_errors)
         
+        if error in DiscordExceptions().all_errors:
+            matches = [error]
+        
         if len(matches) == 0:
             await ctx.message.add_reaction(cross)
             

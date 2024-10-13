@@ -145,14 +145,20 @@ class Developer(commands.Cog):
             await ctx.message.add_reaction(cross)
             
             embed = discord.Embed(colour=discord.Colour.red(), description="No Matches Found")
+            
+            return await ctx.send(embed=embed)
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
             exec(f"raise {matches[0]}")
+            
+            return
         else:
             await ctx.message.add_reaction(cross)
             
             embed = discord.Embed(colour=discord.Colour.red())
             embed.add_field(name="Multiple Matches Found", value=", ".join([f"`{i}`" for i in matches]))
+            
+            return await ctx.send(embed=embed)
             
         
         

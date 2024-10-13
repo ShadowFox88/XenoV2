@@ -93,7 +93,7 @@ class ConfirmView(discord.ui.View):
 
 
 class DismissView(discord.ui.View):
-    def __init__(self, error_id: int, author: discord.Member | discord.User, bot: Xeno):
+    def __init__(self, error_id: int, author: discord.Member | discord.User, bot):
         super().__init__(timeout=None)
         self.author = author
         self.error_id = error_id

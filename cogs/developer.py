@@ -212,7 +212,11 @@ class Developer(commands.Cog):
             return await ctx.send(embed=embed)
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
-            exec(f"raise {matches[0]}")
+            exec(f"""
+                 import discord
+                 from utils.errors import *
+                 
+                 raise {matches[0]}""")
 
             return
         else:

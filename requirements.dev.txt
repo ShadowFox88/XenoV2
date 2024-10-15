@@ -4,3 +4,4 @@ black
 isort
 asyncpg-stubs
 python-dotenv
+ruff

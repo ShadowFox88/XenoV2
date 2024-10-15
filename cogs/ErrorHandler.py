@@ -80,7 +80,21 @@ class ErrorHandler(commands.Cog):
             guild_id = ctx.guild.id
         else:
             guild_id = None
+            
+        webhook = discord.Webhook.from_url(
+            self.bot.error_webhook, session=self.bot.session
+        )
+            
+        message = await webhook.send(embed=discord.Embed(title="Temporary"), wait=True)
 
+        await self.bot.db.execute(
+            "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4, $5)",
+            ctx.message.content,
+            ctx.author.id,
+            guild_id,
+            "".join(traceback.format_exception(error)),
+            message.id
+        )
         
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         error_id = data[0]["id"] + 1
@@ -115,20 +129,8 @@ class ErrorHandler(commands.Cog):
         Guild ID: {ctx.guild.id if ctx.guild else None}"""
 
         developer_embed.add_field(name="Additional Information", value=additional_info)
-
-        webhook = discord.Webhook.from_url(
-            self.bot.error_webhook, session=self.bot.session
-        )
-        message = await webhook.send(embed=developer_embed, wait=True)
         
-        await self.bot.db.execute(
-            "INSERT INTO errors (command, user_id, guild_id, traceback, developer_message_id) VALUES ($1, $2, $3, $4, $5)",
-            ctx.message.content,
-            ctx.author.id,
-            guild_id,
-            "".join(traceback.format_exception(error)),
-            message.id
-        )
+        await message.edit(embed=developer_embed)
 
         self.bot.logger.exception(error, extra={"error": "unexpected"})
 

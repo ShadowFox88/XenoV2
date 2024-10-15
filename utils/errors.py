@@ -21,7 +21,14 @@ class DiscordExceptions:
             copy.deepcopy(self.python_errors)
             + copy.deepcopy(self.base_errors)
             + copy.deepcopy(self.commands_errors)
+            + copy.deepcopy(self.my_errors)
         )
+        
+    def set_my_errors(self):
+        self.my_errors = [
+            "BlacklistedError",
+            "MaintenanceError",
+        ]
 
     def set_python_errors(self):
         self.python_errors = [

@@ -213,10 +213,10 @@ class Developer(commands.Cog):
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
             exec(f"""
-                 import discord
-                 from utils.errors import *
+import discord
+from utils.errors import *
                  
-                 raise {matches[0]}""")
+raise {matches[0]}""")
 
             return
         else:

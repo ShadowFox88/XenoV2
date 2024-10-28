@@ -16,6 +16,7 @@ class DiscordExceptions:
         self.set_python_errors()
         self.set_base_errors()
         self.set_commands_errors()
+        self.set_my_errors()
 
         self.all_errors = (
             copy.deepcopy(self.python_errors)

@@ -75,7 +75,7 @@ class ErrorHandler(commands.Cog):
             
             await ctx.send(label)
 
-            self.bot.logger.exception("Expected Error", exc_info = error, extra={"error": label})
+            self.bot.logger.error("Expected Error", exc_info = error, extra={"tags": {"type": "expected", "error": label}})
             return
 
         if ctx.guild is not None:
@@ -134,7 +134,7 @@ class ErrorHandler(commands.Cog):
         
         await message.edit(embed=developer_embed)
 
-        self.bot.logger.exception("Unexpected Error", exc_info=error, extra={"error": "unexpected"})
+        self.bot.logger.error("Unexpected Error", exc_info=error, extra={"tags": {"type": "unexpected", "error": type(error).__name__}})
 
 
 async def setup(bot: Xeno):

@@ -72,8 +72,10 @@ class ErrorHandler(commands.Cog):
             await ctx.message.add_reaction(emoji)
 
             await ctx.send(embed=embed, reply=True, delete_after=30)
+            
+            await ctx.send(label)
 
-            self.bot.logger.exception(error, extra={"error": label})
+            self.bot.logger.exception("Expected Error", exc_info = error, extra={"error": label})
             return
 
         if ctx.guild is not None:
@@ -132,7 +134,7 @@ class ErrorHandler(commands.Cog):
         
         await message.edit(embed=developer_embed)
 
-        self.bot.logger.exception(error, extra={"error": "unexpected"})
+        self.bot.logger.exception("Unexpected Error", exc_info=error, extra={"error": "unexpected"})
 
 
 async def setup(bot: Xeno):

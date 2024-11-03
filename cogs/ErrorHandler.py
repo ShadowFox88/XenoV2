@@ -43,7 +43,7 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
     ),
 }
 
-ignoredErrors: Tuple[discord.DiscordException] = (
+ignoredErrors: Tuple[type[discord.DiscordException], ...] = (
     commands.CommandNotFound,
     commands.PartialEmojiConversionFailure,
 )
@@ -55,9 +55,9 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: XenoContext, error: commands.CommandError):
-        if isinstance(error, ignoredErrors):
+        if type(error) in ignoredErrors:
             return
-        if isinstance(error, tuple(user_errors.keys())):
+        if type(error) in user_errors:
             error_message = user_errors[type(error)][0]
             label = user_errors[type(error)][1]
 

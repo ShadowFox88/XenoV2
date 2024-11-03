@@ -3,12 +3,12 @@ import logging
 import os
 import re
 from multiprocessing import Queue
-from typing import Any, List
+from typing import Any, List, Collection
 
 import aiohttp
 import asyncpg
 import discord
-import logging_loki
+import logging_loki # type: ignore
 from discord.ext import commands
 
 from utils.context import XenoContext
@@ -16,7 +16,7 @@ from utils.context import XenoContext
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(command_prefix=self.get_prefix, *args, **kwargs, case_insensitive=True)  # type: ignore
+        super().__init__(command_prefix=self.get_prefix, *args, **kwargs, case_insensitive=True, strip_after_prefix=True)  # type: ignore
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
             "animated_red_cross": "<a:AnimatedRedCross:789586505974022164>",
@@ -28,9 +28,7 @@ class Xeno(commands.AutoShardedBot):
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()
         self.maintenance: bool = False
-        self.owner_ids: List[int] = [
-            606648465065246750
-        ]  # , 738662726179487764, 811527737881002024]  # type: ignore
+        self.owner_ids: Collection[int] | None = [606648465065246750]
         self.owners: List[discord.User] | List[None] = []
         self.blacklisted: List[int] = []
         self.support_server: str = ""
@@ -43,7 +41,6 @@ class Xeno(commands.AutoShardedBot):
             "cogs.developer",
             "cogs.lime_and_friends",
         ]
-        self.strip_after_prefix = True
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         logging_loki.emitter.LokiEmitter.level_tag = "level"
@@ -112,8 +109,6 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
-                
-        self.owners = [self.get_user(606648465065246750)] # type: ignore
 
     def get_error_webhook(self):
         return discord.Webhook.from_url(

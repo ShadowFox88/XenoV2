@@ -47,30 +47,31 @@ class Xeno(commands.AutoShardedBot):
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         logging_loki.emitter.LokiEmitter.level_tag = "level"
 
-        queue = Queue(-1)
-        handler = logging.handlers.QueueHandler(queue)
-        handler_loki = logging_loki.LokiHandler(
+
+        handler_loki = logging_loki.LokiQueueHandler(
+            Queue(-1),
             url=os.environ["LOKI_URL"],
             tags={"application": "XenoV2"},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
-        logging.handlers.QueueListener(queue, handler_loki).start()
-
+        
         dt_fmt = "%Y-%m-%d %H:%M:%S"
         formatter = logging.Formatter(
             "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
         )
         file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
         file_handler.setFormatter(formatter)
-
-        discord.utils.setup_logging(handler=file_handler)
+        file_handler.setLevel(logging.INFO)
+        
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(handler)
+        self.logger.addHandler(handler_loki)
+        self.logger.addHandler(file_handler)
         logging.getLogger("discord.http").setLevel(logging.INFO)
 
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
+        self.log_handler = None
         self.token = token
         await super().start(token)
 

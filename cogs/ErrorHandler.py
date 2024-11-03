@@ -43,7 +43,7 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
     ),
 }
 
-ignoredErrors: Tuple[Exception] = (
+ignoredErrors: Tuple[discord.DiscordException] = (
     commands.CommandNotFound,
     commands.PartialEmojiConversionFailure,
 )

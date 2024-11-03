@@ -43,6 +43,7 @@ class Xeno(commands.AutoShardedBot):
             "cogs.developer",
             "cogs.lime_and_friends",
         ]
+        self.strip_after_prefix = True
 
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         logging_loki.emitter.LokiEmitter.level_tag = "level"

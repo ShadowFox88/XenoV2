@@ -72,8 +72,6 @@ class ErrorHandler(commands.Cog):
             await ctx.message.add_reaction(emoji)
 
             await ctx.send(embed=embed, reply=True, delete_after=30)
-            
-            await ctx.send(label)
 
             self.bot.logger.error("Expected Error", exc_info = error, extra={"tags": {"type": "expected", "error": label}})
             return

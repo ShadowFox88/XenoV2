@@ -109,8 +109,6 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
-                
-        self.owners = [self.get_user(i) for i in self.owner_ids] # type: ignore
 
 
     def get_error_webhook(self):

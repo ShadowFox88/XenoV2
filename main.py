@@ -17,6 +17,8 @@ async def on_ready() -> None:
     if bot.user is not None:
         print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")
+    
+    bot.owners = [bot.get_user(i) for i in bot.owner_ids] # type: ignore
 
 
 @bot.after_invoke

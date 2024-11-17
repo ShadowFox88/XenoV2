@@ -41,6 +41,10 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
         "You are missing a required argument for this command!",
         "missing_argument",
     ),
+    commands.NotOwner: (
+        "You must be the owner of the bot to run this command!",
+        "not_owner",
+    ),
 }
 
 ignoredErrors: Tuple[type[discord.DiscordException], ...] = (

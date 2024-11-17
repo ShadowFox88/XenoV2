@@ -159,7 +159,16 @@ class Developer(commands.Cog):
 
     @developer_group.command(aliases=["e"])
     async def error(self, ctx: XenoContext, id: int):
-        data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id) # TODO: Make the error handler store the message ID of the webhook it sends, and delete it when fixed.
+        data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id)
+        
+        if not data:
+            embed = discord.Embed(
+                title="Error Report Not Found",
+                colour=discord.Colour.red(),
+                button = True
+            )
+            return await ctx.send(embed=embed, reply=True)
+        
         traceback = data[0]["traceback"]
         user_id = data[0]["user_id"]
         command = data[0]["command"]
@@ -196,11 +205,13 @@ class Developer(commands.Cog):
 
         cross: str = self.bot.emoji_list["animated_red_cross"]
         tick: str = self.bot.emoji_list["animated_green_tick"]
+        
+        errors = DiscordExceptions().errors
+            
+        matches = difflib.get_close_matches(error, errors.keys)
 
-        matches = difflib.get_close_matches(error, DiscordExceptions().all_errors)
-
-        if error in DiscordExceptions().all_errors:
-            matches = [error]
+        if error in errors.keys():
+            matches = [errors[error]]
 
         if len(matches) == 0:
             await ctx.message.add_reaction(cross)
@@ -212,24 +223,22 @@ class Developer(commands.Cog):
             return await ctx.send(embed=embed)
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
-            exec(f"""
-import discord
-from utils.errors import *
-                 
-raise {matches[0]}""")
+            
+            self.bot.dispatch("command_error", ctx, matches[0]())
 
             return
         else:
             await ctx.message.add_reaction(cross)
-
+            
             embed = discord.Embed(colour=discord.Colour.red())
             embed.add_field(
                 name="Multiple Matches Found",
                 value=", ".join([f"`{i}`" for i in matches]),
             )
-
-            return await ctx.send(embed=embed)
-
+            try:
+                await ctx.send(embed=embed)
+            except discord.HTTPException:
+                embed = discord.Embed(discord.Colour.red(), description="Too many matches to display")
 
 async def setup(bot: Xeno):
     cog = Developer(bot)

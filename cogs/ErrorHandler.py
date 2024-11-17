@@ -109,15 +109,12 @@ class ErrorHandler(commands.Cog):
             text=f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
         )
 
-        emoji = self.bot.emoji_list["animated_red_cross"]
-        await ctx.message.add_reaction(emoji)
-        await ctx.send(embed=embed, reply=True, delete_after=30)
+        
 
         developer_embed = discord.Embed(
             colour=discord.Color.red(), title=f"Error Report: {error_id}"
         )
         developer_embed.timestamp = developer_embed.timestamp or discord.utils.utcnow()
-
         developer_embed.add_field(
             name="Exception",
             value=f"```py\n{''.join(traceback.format_exception_only(error))}```",
@@ -133,6 +130,14 @@ class ErrorHandler(commands.Cog):
         await message.edit(embed=developer_embed)
 
         self.bot.logger.error("Unexpected Error", exc_info=error, extra={"tags": {"type": "unexpected", "error": type(error).__name__}})
+        
+        emoji = self.bot.emoji_list["animated_red_cross"]
+        await ctx.message.add_reaction(emoji)
+        
+        try:
+            await ctx.send(embed=embed, reply=True, delete_after=30)
+        except discord.errors.HTTPException:
+            await ctx.send(message="I couldn't find your original message, was it deleted?", embed=embed, delete_after=30)
 
 
 async def setup(bot: Xeno):

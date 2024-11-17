@@ -130,7 +130,7 @@ class DiscordExceptions:
     def set_commands_errors(self):
         self.commands_errors = [
             discord.ext.commands.CommandError,
-            discord.ext.commands.ConvertionError,
+            discord.ext.commands.ConversionError,
             discord.ext.commands.MissingRequiredArgument,
             discord.ext.commands.MissingRequiredAttachment,
             discord.ext.commands.ArgumentParsingError,

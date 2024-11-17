@@ -162,7 +162,7 @@ class Developer(commands.Cog):
 
         if not data:
             embed = discord.Embed(
-                title="Error Report Not Found",
+                description="Error Report Not Found",
                 colour=discord.Colour.red(),
             )
             return await ctx.send(embed=embed, reply=True, button=True)
@@ -207,9 +207,9 @@ class Developer(commands.Cog):
 
         errors = DiscordExceptions().errors
 
-        matches = difflib.get_close_matches(error, errors.keys)
+        matches = difflib.get_close_matches(error, list(errors.keys()))
 
-        if error in errors.keys():
+        if error in list(errors.keys()):
             matches = [errors[error]]
 
         if len(matches) == 0:

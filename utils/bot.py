@@ -8,7 +8,7 @@ from typing import Any, List, Collection
 import aiohttp
 import asyncpg
 import discord
-import logging_loki # type: ignore
+import logging_loki  # type: ignore
 from discord.ext import commands
 
 from utils.context import XenoContext
@@ -16,7 +16,13 @@ from utils.context import XenoContext
 
 class Xeno(commands.AutoShardedBot):
     def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(command_prefix=self.get_prefix, *args, **kwargs, case_insensitive=True, strip_after_prefix=True)  # type: ignore
+        super().__init__(
+            command_prefix=self.get_prefix,
+            *args,
+            **kwargs,
+            case_insensitive=True,
+            strip_after_prefix=True,
+        )  # type: ignore
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
             "animated_red_cross": "<a:AnimatedRedCross:789586505974022164>",
@@ -45,7 +51,6 @@ class Xeno(commands.AutoShardedBot):
     async def start(self, token: str, *, reconnect: bool = True) -> None:
         logging_loki.emitter.LokiEmitter.level_tag = "level"
 
-
         handler_loki = logging_loki.LokiQueueHandler(
             Queue(-1),
             url=os.environ["LOKI_URL"],
@@ -53,7 +58,7 @@ class Xeno(commands.AutoShardedBot):
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
-        
+
         dt_fmt = "%Y-%m-%d %H:%M:%S"
         formatter = logging.Formatter(
             "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
@@ -61,7 +66,7 @@ class Xeno(commands.AutoShardedBot):
         file_handler = logging.FileHandler("bot.log", encoding="utf-8", mode="a")
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.INFO)
-        
+
         self.logger: logging.Logger = logging.getLogger("discord")
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(handler_loki)
@@ -109,7 +114,6 @@ class Xeno(commands.AutoShardedBot):
                 await self.load_extension(i)
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
-
 
     def get_error_webhook(self):
         return discord.Webhook.from_url(

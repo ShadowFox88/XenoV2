@@ -25,15 +25,15 @@ class DiscordExceptions:
             + copy.deepcopy(self.commands_errors)
             + copy.deepcopy(self.my_errors)
         )
-        
+
         self.errors = {}
-        
+
         for i in self.all_errors:
             error_as_string = str(i).removeprefix("<class '").removesuffix("'>")
             error = i
-            
+
             self.errors[error_as_string] = error
-        
+
     def set_my_errors(self):
         self.my_errors = [
             BlacklistedError,

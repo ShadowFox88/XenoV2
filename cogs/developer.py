@@ -70,7 +70,6 @@ class Developer(commands.Cog):
         arg2: Union[discord.Member, discord.User, int, bool] = None,
         arg3: Union[discord.Member, discord.User, int, bool] = None,
     ):
-
         target = None
         limit = 50
         manual_delete = False
@@ -160,22 +159,21 @@ class Developer(commands.Cog):
     @developer_group.command(aliases=["e"])
     async def error(self, ctx: XenoContext, id: int):
         data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id)
-        
+
         if not data:
             embed = discord.Embed(
                 title="Error Report Not Found",
                 colour=discord.Colour.red(),
-                button = True
             )
-            return await ctx.send(embed=embed, reply=True)
-        
+            return await ctx.send(embed=embed, reply=True, button=True)
+
         traceback = data[0]["traceback"]
         user_id = data[0]["user_id"]
         command = data[0]["command"]
         guild_id = data[0]["guild_id"]
         message_id = data[0]["developer_message_id"]
         error_time = time.mktime(data[0]["error_time"].timetuple())
-        
+
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
@@ -198,16 +196,17 @@ class Developer(commands.Cog):
         embed.add_field(name="Additional Info", value=additional_info)
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
 
-        await ctx.send(embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message))
+        await ctx.send(
+            embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message)
+        )
 
     @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str):
-
         cross: str = self.bot.emoji_list["animated_red_cross"]
         tick: str = self.bot.emoji_list["animated_green_tick"]
-        
+
         errors = DiscordExceptions().errors
-            
+
         matches = difflib.get_close_matches(error, errors.keys)
 
         if error in errors.keys():
@@ -223,13 +222,13 @@ class Developer(commands.Cog):
             return await ctx.send(embed=embed)
         elif len(matches) == 1:
             await ctx.message.add_reaction(tick)
-            
+
             self.bot.dispatch("command_error", ctx, matches[0]())
 
             return
         else:
             await ctx.message.add_reaction(cross)
-            
+
             embed = discord.Embed(colour=discord.Colour.red())
             embed.add_field(
                 name="Multiple Matches Found",
@@ -238,7 +237,10 @@ class Developer(commands.Cog):
             try:
                 await ctx.send(embed=embed)
             except discord.HTTPException:
-                embed = discord.Embed(discord.Colour.red(), description="Too many matches to display")
+                embed = discord.Embed(
+                    discord.Colour.red(), description="Too many matches to display"
+                )
+
 
 async def setup(bot: Xeno):
     cog = Developer(bot)

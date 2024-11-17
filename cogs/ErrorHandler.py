@@ -73,18 +73,22 @@ class ErrorHandler(commands.Cog):
 
             await ctx.send(embed=embed, reply=True, delete_after=30)
 
-            self.bot.logger.error("Expected Error", exc_info = error, extra={"tags": {"type": "expected", "error": label}})
+            self.bot.logger.error(
+                "Expected Error",
+                exc_info=error,
+                extra={"tags": {"type": "expected", "error": label}},
+            )
             return
 
         if ctx.guild is not None:
             guild_id = ctx.guild.id
         else:
             guild_id = None
-            
+
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
-            
+
         message = await webhook.send(embed=discord.Embed(title="Temporary"), wait=True)
 
         await self.bot.db.execute(
@@ -93,9 +97,9 @@ class ErrorHandler(commands.Cog):
             ctx.author.id,
             guild_id,
             "".join(traceback.format_exception(error)),
-            message.id
+            message.id,
         )
-        
+
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         error_id = data[0]["id"]
 
@@ -108,8 +112,6 @@ class ErrorHandler(commands.Cog):
         embed.set_footer(
             text=f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
         )
-
-        
 
         developer_embed = discord.Embed(
             colour=discord.Color.red(), title=f"Error Report: {error_id}"
@@ -126,18 +128,26 @@ class ErrorHandler(commands.Cog):
         Guild ID: {ctx.guild.id if ctx.guild else None}"""
 
         developer_embed.add_field(name="Additional Information", value=additional_info)
-        
+
         await message.edit(embed=developer_embed)
 
-        self.bot.logger.error("Unexpected Error", exc_info=error, extra={"tags": {"type": "unexpected", "error": type(error).__name__}})
-        
+        self.bot.logger.error(
+            "Unexpected Error",
+            exc_info=error,
+            extra={"tags": {"type": "unexpected", "error": type(error).__name__}},
+        )
+
         emoji = self.bot.emoji_list["animated_red_cross"]
         await ctx.message.add_reaction(emoji)
-        
+
         try:
             await ctx.send(embed=embed, reply=True, delete_after=30)
         except discord.errors.HTTPException:
-            await ctx.send(message="I couldn't find your original message, was it deleted?", embed=embed, delete_after=30)
+            await ctx.send(
+                message="I couldn't find your original message, was it deleted?",
+                embed=embed,
+                delete_after=30,
+            )
 
 
 async def setup(bot: Xeno):

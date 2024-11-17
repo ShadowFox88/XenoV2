@@ -78,7 +78,9 @@ class Information(commands.Cog):
         embed.title = "Bot Information"
         embed.colour = discord.Color.teal()
 
-        embed.set_author(name=self.bot.owners[0].name, icon_url=self.bot.owners[0].display_avatar.url)  # type: ignore
+        embed.set_author(
+            name=self.bot.owners[0].name, icon_url=self.bot.owners[0].display_avatar.url
+        )  # type: ignore
 
         embed.add_field(name="Guilds", value=len(self.bot.guilds))
         embed.add_field(name="Users", value=len(self.bot.users))

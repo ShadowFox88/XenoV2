@@ -89,7 +89,13 @@ class ConfirmView(discord.ui.View):
 
 
 class DismissView(discord.ui.View):
-    def __init__(self, error_id: int, author: discord.Member | discord.User, bot, developer_message: discord.WebhookMessage | None):
+    def __init__(
+        self,
+        error_id: int,
+        author: discord.Member | discord.User,
+        bot,
+        developer_message: discord.WebhookMessage | None,
+    ):
         super().__init__(timeout=None)
         self.author = author
         self.error_id = error_id
@@ -114,7 +120,7 @@ class DismissView(discord.ui.View):
             )
             if self.developer_message is not None:
                 await self.developer_message.delete()
-            
+
             self.stop()
             return
         await interaction.response.send_message(

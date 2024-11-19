@@ -97,3 +97,15 @@ class XenoContext(commands.Context["Xeno"]):
         slash = get_emoji(name="greyTick", id=895688440690114560)
 
     emoji = Emoji()
+    
+    @discord.utils.cached_property
+    def reference(self) -> discord.Message | None:
+        if not self.message:
+            return None
+        if not self.message.reference:
+            return None
+        message = self.message.reference.resolved
+        
+        if not isinstance(message, discord.Message):
+            return None
+        return message

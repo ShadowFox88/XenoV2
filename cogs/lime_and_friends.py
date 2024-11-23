@@ -69,7 +69,7 @@ class Lime_And_Friends(commands.Cog):
     
     @commands.is_owner()
     @commands.command()
-    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, times: TimeoutTime) -> None:
+    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, *, times: TimeoutTime) -> None:
         
         time = {
                 "seconds": times.seconds,

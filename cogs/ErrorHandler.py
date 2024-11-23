@@ -111,15 +111,25 @@ class ErrorHandler(commands.Cog):
         data = await self.bot.db.fetch("SELECT id FROM errors ORDER BY id DESC LIMIT 1")
         error_id = data[0]["id"]
 
-        embed = discord.Embed(
-            colour=discord.Color.red(),
-            title="An unexpected error occurred while running this command, my developers are aware.",
-            description=f"```py\n{''.join(traceback.format_exception(error))}```",
-        )
-        embed.timestamp = embed.timestamp or discord.utils.utcnow()
-        embed.set_footer(
-            text=f"Should you wish to talk to the developer about this error, refer to it by its ID: {error_id}"
-        )
+        if ctx.bot.is_owner(ctx.author):
+            embed = discord.Embed(
+                colour=discord.Color.red(),
+                title="An unexpected error occurred while running this command, my developers are aware.",
+                description=f"```py\n{''.join(traceback.format_exception(error))}```",
+            )
+            embed.timestamp = discord.utils.utcnow()
+            embed.set_footer(
+                text=f"Error ID: {error_id}"
+            )
+        else:
+            embed = discord.Embed(
+                colour=discord.Color.red(),
+                description="An unexpected error occurred while running this command, my developers have been informed",
+            )
+            embed.timestamp = discord.utils.utcnow()
+            embed.set_footer(
+                text=f"If you wish to talk to my developers about this, the rrror ID is: {error_id}"
+            )
 
         developer_embed = discord.Embed(
             colour=discord.Color.red(), title=f"Error Report: {error_id}"

@@ -1,5 +1,5 @@
 import discord
-
+from typing import Optional
 
 class DeleteView(discord.ui.View):
     def __init__(self, author: discord.Member | discord.User):

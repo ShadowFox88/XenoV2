@@ -70,7 +70,9 @@ class Lime_And_Friends(commands.Cog):
     @commands.is_owner()
     @commands.command()
     async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, *, times: TimeoutTime) -> None:
-        
+        """
+        Times out a user for a specific amount of time. Maximum time is 4 weeks.
+        """
         time = {
                 "seconds": times.seconds,
                 "minutes": times.minutes,

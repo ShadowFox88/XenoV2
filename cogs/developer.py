@@ -1,6 +1,6 @@
 import difflib
 import time
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 import discord
 from discord.ext import commands
@@ -157,7 +157,7 @@ class Developer(commands.Cog):
             return await ctx.reply(embed=embed)
 
     @developer_group.command(aliases=["e"])
-    async def error(self, ctx: XenoContext, id: int):
+    async def error(self, ctx: XenoContext, id: int, fixed: Optional[bool] = False):
         data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", id)
 
         if not data:
@@ -173,7 +173,7 @@ class Developer(commands.Cog):
         guild_id = data[0]["guild_id"]
         message_id = data[0]["developer_message_id"]
         error_time = time.mktime(data[0]["error_time"].timetuple())
-
+        
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
@@ -182,6 +182,16 @@ class Developer(commands.Cog):
         except discord.errors.NotFound:
             developer_message = None
 
+        if fixed:
+            await self.bot.db.execute("DELETE FROM errors WHERE id = $1", id)
+            await developer_message.delete()
+
+            embed = discord.Embed(
+                description=f"Error {id} Fixed",
+                colour=discord.Colour.green(),
+            )
+            return await ctx.send(embed=embed, reply=True, delete_after=30)
+        
         embed = discord.Embed(
             title=f"Error Report: {id}",
             description=f"```py\n{traceback}```",

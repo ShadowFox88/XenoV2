@@ -165,7 +165,7 @@ class Developer(commands.Cog):
                 description="Error Report Not Found",
                 colour=discord.Colour.red(),
             )
-            return await ctx.send(embed=embed, reply=True, button=True)
+            return await ctx.send(embed=embed, reply=True, delete_after=30)
 
         traceback = data[0]["traceback"]
         user_id = data[0]["user_id"]
@@ -207,7 +207,7 @@ class Developer(commands.Cog):
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
 
         await ctx.send(
-            embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message)
+            embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message), delete_after=60
         )
 
     @developer_group.command(aliases=["re", "raise"])

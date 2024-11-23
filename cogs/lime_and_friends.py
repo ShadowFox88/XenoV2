@@ -77,9 +77,7 @@ class Lime_And_Friends(commands.Cog):
                 "hours": times.hours,
                 "days": times.days,
                 "weeks": times.weeks
-            }
-                
-        await ctx.send(time)
+        }
                 
         if not any(time.values()):
             raise commands.BadArgument("Please provide a time to timeout the user for.")

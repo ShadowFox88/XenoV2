@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 
 from utils.bot import Xeno
 from utils.context import XenoContext
@@ -50,10 +51,18 @@ class Lime_And_Friends(commands.Cog):
     async def mass_slowmode(self, ctx: XenoContext, slowmode: int) -> None:
         for channel in ctx.guild.text_channels:
             await channel.edit(slowmode_delay=slowmode)
+            
+        embed = discord.Embed(
+            description=f"Set slowmode to {slowmode} in all channels.",
+            color=discord.Color.green()
+        )
+        
+        await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
+        await ctx.send(embed=embed)
 
     @commands.is_owner()
     @commands.command()
-    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, **kwargs):
+    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, **kwargs) -> None:
         
         time = {
             "seconds": 0,

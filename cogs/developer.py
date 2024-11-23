@@ -209,6 +209,26 @@ class Developer(commands.Cog):
         await ctx.send(
             embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message), delete_after=60
         )
+        
+    @developer_group.command(aliases=["ec", "ce"])
+    async def clear_errors(self, ctx: XenoContext):
+        data = await self.bot.db.fetch("SELECT * FROM errors")
+        
+        webhook = discord.Webhook.from_url(
+            self.bot.error_webhook, session=self.bot.session
+        )
+        
+        for i in data:
+            try:
+                developer_message = await webhook.fetch_message(i["developer_message_id"])
+            except discord.errors.NotFound:
+                developer_message = None
+                
+            if developer_message:
+                await developer_message.delete()
+        
+        await self.bot.db.execute("DELETE FROM errors")
+        await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
 
     @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str):

@@ -230,7 +230,7 @@ class Developer(commands.Cog):
         await self.bot.db.execute("DELETE FROM errors")
 
         embed = discord.Embed(
-            description="Errors Cleared",
+            description=f"Cleared {len(data)} Errors",
             colour=discord.Colour.green(),
         )
 

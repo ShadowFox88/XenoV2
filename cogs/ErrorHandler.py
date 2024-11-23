@@ -22,28 +22,32 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
         "on_cooldown",
     ),
     commands.CheckFailure: (
-        "You do not have permission to run this command!",
+        "You do not have permission to run this command.",
         "user_bad_permissions",
     ),
     commands.TooManyArguments: (
-        "You have provided too many arguments for this command!",
+        "You have provided too many arguments for this command.",
         "too_many_arguments",
     ),
     commands.BadArgument: (
-        "You have provided an invalid argument for this command!",
+        "You have provided an invalid argument for this command.",
         "bad_argument",
     ),
     commands.BotMissingPermissions: (
-        "I am missing the necessary permissions to run this command!",
+        "I am missing the necessary permissions to run this command.",
         "missing_permissions",
     ),
     commands.MissingRequiredArgument: (
-        "You are missing a required argument for this command!",
+        "You are missing a required argument for this command.",
         "missing_argument",
     ),
     commands.NotOwner: (
-        "You must be the owner of the bot to run this command!",
+        "You must be the owner of the bot to run this command.",
         "not_owner",
+    ),
+    commands.MemberNotFound: (
+        "I couldn't find that member.",
+        "member_not_found",
     ),
 }
 

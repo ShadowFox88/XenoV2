@@ -76,6 +76,8 @@ class Lime_And_Friends(commands.Cog):
             if k in time.keys():
                 time[k] = v
                 
+        await ctx.send(kwargs)
+                
         if not any(time.values()):
             raise commands.BadArgument("Please provide a time to timeout the user for.")
               

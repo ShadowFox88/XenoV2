@@ -78,8 +78,18 @@ class Lime_And_Friends(commands.Cog):
                 
         if not any(time.values()):
             raise commands.BadArgument("Please provide a time to timeout the user for.")
-                
+              
         await user.timeout(datetime.timedelta(**time))
+                
+        embed = discord.Embed(
+            description=f"Timed out {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}",
+            color=discord.Color.green()
+        )
+                
+        
+        await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
+        await ctx.send(embed=embed)
+        
 
 async def setup(bot: Xeno):
     cog = Lime_And_Friends(bot)

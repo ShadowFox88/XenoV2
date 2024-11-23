@@ -11,7 +11,7 @@ class Lime_And_Friends(commands.Cog):
         self.bot = bot
         
     async def cog_check(self, ctx):
-        return ctx.guild.id == 1265697842475831397
+        return (ctx.guild.id == 1265697842475831397) or ctx.bot.is_owner(ctx.author)
 
     @commands.command()
     async def unpin(self, ctx: XenoContext, message_id: int | None) -> None:

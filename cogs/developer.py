@@ -228,7 +228,14 @@ class Developer(commands.Cog):
                 await developer_message.delete()
         
         await self.bot.db.execute("DELETE FROM errors")
+
+        embed = discord.Embed(
+            description="Errors Cleared",
+            colour=discord.Colour.green(),
+        )
+
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
+        await ctx.send(embed=embed, reply=True, delete_after=30)
 
     @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str):

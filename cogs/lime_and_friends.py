@@ -60,23 +60,26 @@ class Lime_And_Friends(commands.Cog):
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
         await ctx.send(embed=embed)
 
+    class TimeoutTime(commands.FlagConverter):
+        seconds: int = 0
+        minutes: int = 0
+        hours: int = 0
+        days: int = 0
+        weeks: int = 0
+    
     @commands.is_owner()
     @commands.command()
-    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, **kwargs) -> None:
+    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, times: TimeoutTime) -> None:
         
         time = {
-            "seconds": 0,
-            "minutes": 0,
-            "hours": 0,
-            "days": 0,
-            "weeks": 0
-        }
-        
-        for k, v in kwargs:
-            if k in time.keys():
-                time[k] = v
+                "seconds": times.seconds,
+                "minutes": times.minutes,
+                "hours": times.hours,
+                "days": times.days,
+                "weeks": times.weeks
+            }
                 
-        await ctx.send(kwargs)
+        await ctx.send(time)
                 
         if not any(time.values()):
             raise commands.BadArgument("Please provide a time to timeout the user for.")

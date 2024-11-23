@@ -2,6 +2,7 @@ from discord.ext import commands
 
 from utils.bot import Xeno
 from utils.context import XenoContext
+import datetime
 
 
 class Lime_And_Friends(commands.Cog):
@@ -43,7 +44,33 @@ class Lime_And_Friends(commands.Cog):
             return
 
         await message.pin()
+        
+    @commands.is_owner()
+    @commands.command()
+    async def mass_slowmode(self, ctx: XenoContext, slowmode: int) -> None:
+        for channel in ctx.guild.text_channels:
+            await channel.edit(slowmode_delay=slowmode)
 
+    @commands.is_owner()
+    @commands.command()
+    async def timeout(self, ctx: XenoContext, user: commands.MemberConverter, **kwargs):
+        
+        time = {
+            "seconds": 0,
+            "minutes": 0,
+            "hours": 0,
+            "days": 0,
+            "weeks": 0
+        }
+        
+        for k, v in kwargs:
+            if k in time.keys():
+                time[k] = v
+                
+        if not any(time.values()):
+            raise commands.BadArgument("Please provide a time to timeout the user for.")
+                
+        await user.timeout(datetime.timedelta(**time))
 
 async def setup(bot: Xeno):
     cog = Lime_And_Friends(bot)

@@ -92,7 +92,7 @@ class Lime_And_Friends(commands.Cog):
 
         if not any(time.values()):
             embed = discord.Embed(
-                description="This will remove any timeout the user has.",
+                description="Are you sure you want to remove any timeout the user has.",
                 color=discord.Color.orange(),
             )
         else:
@@ -119,13 +119,21 @@ class Lime_And_Friends(commands.Cog):
             )
             await confirm_message.edit(embed=embed, view=None)
             return
-
+        
+        
+        await confirm_message.delete()
         await user.timeout(datetime.timedelta(**time))
 
-        embed = discord.Embed(
-            description=f"Timed out {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}",
-            color=discord.Color.green(),
-        )
+        if not any(time.values()):
+            embed = discord.Embed(
+                description=f"Removed timeout from {user.mention}",
+                color=discord.Color.green(),
+            )
+        else:
+            embed = discord.Embed(
+                description=f"Timed out {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}",
+                color=discord.Color.green(),
+            )
 
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
         await ctx.send(embed=embed)

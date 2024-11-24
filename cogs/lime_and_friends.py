@@ -92,7 +92,7 @@ class Lime_And_Friends(commands.Cog):
 
         if not any(time.values()):
             embed = discord.Embed(
-                description="Are you sure you want to remove any timeout the user has.",
+                description="Are you sure you want to remove any timeout the user has?",
                 color=discord.Color.orange(),
             )
         else:

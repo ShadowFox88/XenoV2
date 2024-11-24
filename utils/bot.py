@@ -3,7 +3,7 @@ import logging
 import os
 import re
 from multiprocessing import Queue
-from typing import Any, List, Collection
+from typing import Any, Collection, List
 
 import aiohttp
 import asyncpg

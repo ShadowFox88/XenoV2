@@ -1,6 +1,6 @@
 import difflib
 import time
-from typing import Dict, Union, Optional
+from typing import Dict, Optional, Union
 
 import discord
 from discord.ext import commands
@@ -173,7 +173,7 @@ class Developer(commands.Cog):
         guild_id = data[0]["guild_id"]
         message_id = data[0]["developer_message_id"]
         error_time = time.mktime(data[0]["error_time"].timetuple())
-        
+
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
@@ -191,7 +191,7 @@ class Developer(commands.Cog):
                 colour=discord.Colour.green(),
             )
             return await ctx.send(embed=embed, reply=True, delete_after=30)
-        
+
         embed = discord.Embed(
             title=f"Error Report: {id}",
             description=f"```py\n{traceback}```",
@@ -207,26 +207,30 @@ class Developer(commands.Cog):
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
 
         await ctx.send(
-            embed=embed, view=DismissView(id, ctx.author, self.bot, developer_message), delete_after=60
+            embed=embed,
+            view=DismissView(id, ctx.author, self.bot, developer_message),
+            delete_after=60,
         )
-        
+
     @developer_group.command(aliases=["ec", "ce"])
     async def clear_errors(self, ctx: XenoContext):
         data = await self.bot.db.fetch("SELECT * FROM errors")
-        
+
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
-        
+
         for i in data:
             try:
-                developer_message = await webhook.fetch_message(i["developer_message_id"])
+                developer_message = await webhook.fetch_message(
+                    i["developer_message_id"]
+                )
             except discord.errors.NotFound:
                 developer_message = None
-                
+
             if developer_message:
                 await developer_message.delete()
-        
+
         await self.bot.db.execute("DELETE FROM errors")
 
         embed = discord.Embed(

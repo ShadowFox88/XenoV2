@@ -1,5 +1,6 @@
 import discord
 
+
 class DeleteView(discord.ui.View):
     def __init__(self, author: discord.Member | discord.User):
         super().__init__(timeout=None)

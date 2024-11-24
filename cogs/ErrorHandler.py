@@ -118,9 +118,7 @@ class ErrorHandler(commands.Cog):
                 description=f"```py\n{''.join(traceback.format_exception(error))}```",
             )
             embed.timestamp = discord.utils.utcnow()
-            embed.set_footer(
-                text=f"Error ID: {error_id}"
-            )
+            embed.set_footer(text=f"Error ID: {error_id}")
         else:
             embed = discord.Embed(
                 colour=discord.Color.red(),

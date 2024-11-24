@@ -1,7 +1,7 @@
 import copy
 
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
 
 class BlacklistedError(commands.CheckFailure):

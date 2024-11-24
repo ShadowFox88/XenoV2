@@ -3,6 +3,7 @@ import discord
 
 from utils.bot import Xeno
 from utils.context import XenoContext
+from utils.views import ConfirmView
 import datetime
 
 
@@ -81,12 +82,40 @@ class Lime_And_Friends(commands.Cog):
                 "weeks": times.weeks
         }
                 
-        if not any(time.values()):
-            raise commands.BadArgument("Please provide a time to timeout the user for.")
-        
         if datetime.timedelta(**time) > datetime.timedelta(weeks=4):
             raise commands.BadArgument("You can only timeout a user for a maximum of 4 weeks.")
-              
+                
+        if not any(time.values()):
+            embed = discord.Embed(
+                description="This will remove any timeout the user has.",
+                color=discord.Color.orange()
+            )
+        else:
+            embed = discord.Embed(
+                description=f"Are you sure you want to timeout {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}?",
+                color=discord.Color.orange()
+            )
+        
+        view = ConfirmView(ctx.author)
+        
+        confirm_message = await ctx.send(embed=embed, view=view)
+        
+        await view.wait()
+        if view.value is None:
+            embed = discord.Embed(
+                description="You took too long. This operation was cancelled.",
+                color=discord.Color.red()
+            )
+            await confirm_message.edit(embed=embed, view=None)
+        
+        if not view.value:
+            embed = discord.Embed(
+                description="Operation cancelled.",
+                color=discord.Color.red()
+            )
+            await confirm_message.edit(embed=embed, view=None)
+            return
+            
         await user.timeout(datetime.timedelta(**time))
                 
         embed = discord.Embed(

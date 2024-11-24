@@ -136,8 +136,8 @@ class Lime_And_Friends(commands.Cog):
             
         embed.timestamp = discord.utils.utcnow()
         embed.set_footer(
-            text=f"Command ran by {self.author.display_name}",
-            icon_url=self.author.display_avatar.url,
+            text=f"Command ran by {ctx.author.display_name}",
+            icon_url=ctx.author.display_avatar.url,
         )
 
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])

@@ -121,7 +121,6 @@ class Lime_And_Friends(commands.Cog):
             return
         
         
-        await confirm_message.delete()
         await user.timeout(datetime.timedelta(**time))
 
         if not any(time.values()):
@@ -136,7 +135,7 @@ class Lime_And_Friends(commands.Cog):
             )
 
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
-        await ctx.send(embed=embed)
+        await confirm_message.edit(embed=embed, view=None)
 
 
 async def setup(bot: Xeno):

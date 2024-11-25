@@ -90,7 +90,7 @@ class Lime_And_Friends(commands.Cog):
                 "You can only timeout a user for a maximum of 4 weeks."
             )
 
-        if not any(time.values()):
+        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(seconds=0):
             embed = discord.Embed(
                 description="Are you sure you want to remove any timeout the user has?",
                 color=discord.Color.orange(),
@@ -123,7 +123,7 @@ class Lime_And_Friends(commands.Cog):
         
         await user.timeout(datetime.timedelta(**time))
 
-        if not any(time.values()):
+        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(seconds=0):
             embed = discord.Embed(
                 description=f"Removed timeout from {user.mention}",
                 color=discord.Color.green(),

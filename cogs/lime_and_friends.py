@@ -17,7 +17,8 @@ class Lime_And_Friends(commands.Cog):
 
     @commands.command()
     async def unpin(self, ctx: XenoContext, message_id: int | None) -> None:
-        assert not (message_id and ctx.reference)
+        if (message_id and ctx.reference):
+            raise AssertionError
 
         if message_id:
             message = await ctx.fetch_message(message_id)
@@ -29,12 +30,14 @@ class Lime_And_Friends(commands.Cog):
             await ctx.send("Please provide a message to unpin")
             return
 
-        assert message.pinned
+        if not message.pinned:
+            raise AssertionError
         await message.unpin()
 
     @commands.command()
     async def pin(self, ctx: XenoContext, message_id: int | None) -> None:
-        assert not (message_id and ctx.reference)
+        if (message_id and ctx.reference):
+            raise AssertionError
 
         if message_id:
             message = await ctx.fetch_message(message_id)

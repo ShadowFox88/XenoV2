@@ -67,7 +67,6 @@ class ErrorHandler(commands.Cog):
             return
         if type(error) in user_errors:
             error_message = user_errors[type(error)][0]
-            label = user_errors[type(error)][1]
 
             embed = discord.Embed(colour=discord.Color.red())
             embed.timestamp = embed.timestamp or discord.utils.utcnow()
@@ -80,12 +79,6 @@ class ErrorHandler(commands.Cog):
             await ctx.message.add_reaction(emoji)
 
             await ctx.send(embed=embed, reply=True, delete_after=30)
-
-            self.bot.logger.error(
-                "Expected Error",
-                exc_info=error,
-                extra={"tags": {"type": "expected", "error": label}},
-            )
             return
 
         if ctx.guild is not None:

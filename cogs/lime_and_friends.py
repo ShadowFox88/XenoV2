@@ -17,7 +17,7 @@ class Lime_And_Friends(commands.Cog):
 
     @commands.command()
     async def unpin(self, ctx: XenoContext, message_id: int | None) -> None:
-        if (message_id and ctx.reference):
+        if message_id and ctx.reference:
             raise AssertionError
 
         if message_id:
@@ -36,7 +36,7 @@ class Lime_And_Friends(commands.Cog):
 
     @commands.command()
     async def pin(self, ctx: XenoContext, message_id: int | None) -> None:
-        if (message_id and ctx.reference):
+        if message_id and ctx.reference:
             raise AssertionError
 
         if message_id:
@@ -93,7 +93,9 @@ class Lime_And_Friends(commands.Cog):
                 "You can only timeout a user for a maximum of 4 weeks."
             )
 
-        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(seconds=0):
+        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(
+            seconds=0
+        ):
             embed = discord.Embed(
                 description="Are you sure you want to remove any timeout the user has?",
                 color=discord.Color.orange(),
@@ -122,11 +124,12 @@ class Lime_And_Friends(commands.Cog):
             )
             await confirm_message.edit(embed=embed, view=None)
             return
-        
-        
+
         await user.timeout(datetime.timedelta(**time))
 
-        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(seconds=0):
+        if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(
+            seconds=0
+        ):
             embed = discord.Embed(
                 description=f"Removed timeout from {user.mention}",
                 color=discord.Color.green(),
@@ -136,7 +139,7 @@ class Lime_And_Friends(commands.Cog):
                 description=f"Timed out {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}",
                 color=discord.Color.green(),
             )
-            
+
         embed.timestamp = discord.utils.utcnow()
         embed.set_footer(
             text=f"Command ran by {ctx.author.display_name}",

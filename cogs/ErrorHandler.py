@@ -49,6 +49,10 @@ user_errors: dict[type[Exception], Tuple[str, str]] = {
         "I couldn't find that member.",
         "member_not_found",
     ),
+    commands.errors.DisabledCommand: (
+        "This command is currently disabled.",
+        "command_disabled",
+    ),
 }
 
 ignoredErrors: Tuple[type[discord.DiscordException], ...] = (

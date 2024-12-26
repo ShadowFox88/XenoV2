@@ -3,7 +3,7 @@ name = "xenov2"
 version = "0.1.0"
 description = ""
 authors = ["Vahin Mehra <vahin@vahin.dev>"]
-license = "MIT"
+license = "AGPL-3.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]

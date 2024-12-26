@@ -15,21 +15,21 @@ from utils.context import XenoContext
 
 
 class Xeno(commands.AutoShardedBot):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: any, **kwargs: any) -> None:
         super().__init__(
             command_prefix=self.get_prefix,
-            *args,
+            *args,  # noqa: B026
             **kwargs,
             case_insensitive=True,
             strip_after_prefix=True,
-        )  # type: ignore
+        )
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
             "animated_red_cross": "<a:AnimatedRedCross:789586505974022164>",
         }
 
         self.cooldown: commands.CooldownMapping[discord.Message] = (
-            commands.CooldownMapping.from_cooldown(1, 1.5, commands.BucketType.member)  # type: ignore
+            commands.CooldownMapping.from_cooldown(1, 1.5, commands.BucketType.member)
         )
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()

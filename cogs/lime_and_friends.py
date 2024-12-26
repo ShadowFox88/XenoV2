@@ -108,7 +108,7 @@ class Lime_And_Friends(commands.Cog):
 
         view = ConfirmView(ctx.author)
 
-        confirm_message = await ctx.send(embed=embed, view=view)
+        confirm_message = await ctx.reply(embed=embed, view=view)
 
         await view.wait()
         if view.value is None:

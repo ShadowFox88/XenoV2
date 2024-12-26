@@ -26,17 +26,28 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
+  # db_migrations:
+  #   container_name: Prisma
+  #   build:
+  #     context: ./prisma
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
   bot:
     container_name: "Xeno"
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - .:/main
+    # volumes:
+    #   - .:/main
     depends_on:
       postgres:
         condition: service_healthy
+      # db_migrations:
+      #   condition: service_completed_successfully
     env_file:
       - .env
     environment:

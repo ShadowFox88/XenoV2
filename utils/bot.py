@@ -12,6 +12,7 @@ import logging_loki  # type: ignore
 from discord.ext import commands
 
 from utils.context import XenoContext
+from prisma import Prisma
 
 
 class Xeno(commands.AutoShardedBot):
@@ -82,9 +83,10 @@ class Xeno(commands.AutoShardedBot):
         await self.session.close()
         await self.db.close()
         await super().close()
+        await self.prisma.disconnect()
 
     async def get_prefix(self, message: discord.Message):
-        return commands.when_mentioned_or(*["x-", "=="])(self, message)
+        return commands.when_mentioned_or(*["x-", "=="] if not os.environ["TEST"] else ["t;"])(self, message)
 
     async def setup_hook(self):
         self.db: asyncpg.Pool[Any] | Any = await asyncpg.create_pool(
@@ -97,15 +99,12 @@ class Xeno(commands.AutoShardedBot):
         if not self.db:
             raise RuntimeError("Couldn't connect to database!")
 
-        with open("schema.sql") as file:
-            await self.db.execute(file.read())
+        # record = await self.db.fetch(
+        #     "SELECT id FROM blacklist WHERE blacklist_active = true"
+        # )
 
-        record = await self.db.fetch(
-            "SELECT id FROM blacklist WHERE blacklist_active = true"
-        )
-
-        for i in record:
-            self.blacklisted.append(i["id"])
+        # for i in record:
+        #     self.blacklisted.append(i["id"])
 
         await self.load_extension("jishaku")
 
@@ -115,14 +114,16 @@ class Xeno(commands.AutoShardedBot):
             except Exception as e:
                 print(f"Failed to load extension {i} with error {e}")
 
+        self.prisma = Prisma()
+        await self.prisma.connect()
+
     def get_error_webhook(self):
         return discord.Webhook.from_url(
             self.error_webhook, session=self.session, bot_token=self.token
         )
 
     def format_print(self, text: str) -> str:
-        format = str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")
-        return format
+        return str(datetime.datetime.now().strftime("%x | %X") + f" | {text}")
 
     def get_message_emojis(
         self, message: discord.Message

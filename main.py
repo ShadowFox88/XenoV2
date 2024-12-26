@@ -18,7 +18,7 @@ async def on_ready() -> None:
         print(f"Logged in as {bot.user} ({bot.user.id})")
     print(f"Launched at {bot.launch_time}")
 
-    bot.owners = [bot.get_user(i) for i in bot.owner_ids]  # type: ignore
+    bot.owners = [bot.get_user(i) for i in bot.owner_ids]
 
 
 @bot.after_invoke
@@ -86,7 +86,7 @@ async def on_message_edit(before, after):
 
 async def main() -> None:
     async with bot:
-        await bot.start(os.environ["TOKEN"])
+        await bot.start(os.environ["TOKEN"] if not os.environ["TEST"] else os.environ["TEST_TOKEN"])
 
 
 if __name__ == "__main__":

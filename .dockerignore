@@ -2,8 +2,9 @@ example.env
 LICENSE
 requirements.dev.txt
 README.md
-pyproject.toml
 .vscode
 .github
 .gitignore
 __pycache__
+.pdm_python
+pdm.lock

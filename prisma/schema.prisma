@@ -1,0 +1,72 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://Xeno:Xeno@XenoDB:5432/Xeno"
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+  // output              = "/main/prisma/generated/client"
+}
+
+enum entityType {
+  USER
+  GUILD
+}
+
+enum channelType {
+  TEXT
+  VOICE
+}
+
+enum ArchiveMode {
+  LEAVE
+  INACTIVE
+  MANUAL
+}
+
+model Entities {
+  ID             BigInt           @id @unique
+  type           entityType
+  prefix         String           @default("x-")
+  Blacklist      Blacklist?
+  UserChannels   UserChannels[]
+  ErrorReminders ErrorReminders[] @relation("ErrorReminders")
+}
+
+model Blacklist {
+  entityID         BigInt   @id @unique
+  entity           Entities @relation(fields: [entityID], references: [ID])
+  reason           String
+  blacklistedOn    DateTime @default(now())
+  blacklistedUntil DateTime @default(now())
+  blacklistActive  Boolean  @default(true)
+}
+
+model UserChannels {
+  channelID   BigInt       @id @unique
+  ownerID     BigInt
+  entity      Entities     @relation(fields: [ownerID], references: [ID])
+  archiveMode ArchiveMode?
+}
+
+model Errors {
+  ID             Int              @id @unique @default(autoincrement())
+  traceback      String
+  userID         BigInt
+  guildID        BigInt?
+  errorTime      DateTime         @default(now())
+  errorMessageID BigInt
+  fixed          Boolean          @default(false)
+  ErrorReminders ErrorReminders[]
+}
+
+model ErrorReminders {
+  error   Errors   @relation(fields: [errorID], references: [ID])
+  errorID Int
+  userID  BigInt
+  users   Entities @relation("ErrorReminders", fields: [userID], references: [ID])
+
+  @@id([errorID, userID])
+}

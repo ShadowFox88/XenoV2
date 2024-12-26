@@ -1,9 +1,8 @@
 asyncio
 aiohttp
 asyncpg
-asyncpg_stubs
 cachetools
-discord.py
+discord.py[voice]
 jishaku @ git+https://github.com/Gorialis/jishaku
 python-dotenv
 typing_extensions
@@ -11,3 +10,4 @@ gitpython
 psutil
 humanfriendly
 python-logging-loki
+prisma

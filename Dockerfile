@@ -1,13 +1,20 @@
-FROM python:3.12.5
+FROM python:3.12.8-alpine
+
+ENV POETRY_VIRTUALENVS_CREATE false
+ENV PYTHONIOENCODING utf-8
 
 WORKDIR /main
 
-COPY requirements.txt .
+RUN apk add --no-cache gcc python3-dev musl-dev linux-headers openssl bash git
 
-RUN pip install -Ur requirements.txt
+ADD poetry.lock .
+ADD pyproject.toml .
+RUN pip install poetry && poetry install --no-root
 
-RUN git config --global --add safe.directory /main
+ADD ./prisma ./prisma
+RUN poetry run prisma generate
 
-COPY . .
+ADD . /main
 
-CMD ["python", "main.py"]
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["poetry run prisma db push --schema prisma/schema.prisma && python main.py"]

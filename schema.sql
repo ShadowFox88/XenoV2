@@ -81,6 +81,7 @@ DO $$ BEGIN
         WHEN duplicate_object THEN null;
 END$$;
 
+/*
 CREATE TABLE media {
     id_al PRIMARY KEY,
     id_mal INT NOT NULL UNIQUE,
@@ -133,3 +134,4 @@ CREATE RULE delete_old_update AS ON UPDATE to media
 
 CREATE RULE delete_old_insert AS ON INSERT to media
     DO DELETE FROM media WHERE created_on < now() - interval '3 days';
+*/

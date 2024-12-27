@@ -1,5 +1,4 @@
 from discord.ext import commands, tasks
-
 from utils.bot import Xeno
 
 
@@ -12,18 +11,20 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=2.0)
     async def update_blacklist(self):
-        await self.bot.db.execute(
-            "UPDATE blacklist SET blacklist_active = false WHERE blacklist_active = true AND blacklist_expiry < NOW()"
-        )
+        # await self.bot.db.execute(
+        #     "UPDATE blacklist SET blacklist_active = false WHERE blacklist_active = true AND blacklist_expiry < NOW()"
+        # )
 
-        record = await self.bot.db.fetch(
-            "SELECT id FROM blacklist WHERE blacklist_active = true"
-        )
+        # record = await self.bot.db.fetch(
+        #     "SELECT id FROM blacklist WHERE blacklist_active = true"
+        # )
 
-        self.bot.blacklisted.clear()
+        # self.bot.blacklisted.clear()
 
-        for i in record:
-            self.bot.blacklisted.append(i["id"])
+        # for i in record:
+        #     self.bot.blacklisted.append(i["id"])
+
+        pass
 
     @update_blacklist.before_loop
     async def before(self):

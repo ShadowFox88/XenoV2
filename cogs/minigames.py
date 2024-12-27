@@ -2,7 +2,6 @@ import random
 
 import discord
 from discord.ext import commands
-
 from utils.bot import Xeno
 from utils.context import XenoContext
 
@@ -19,7 +18,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
         state = view.board[self.x][self.y]
 
         if state is not None:
-            return
+            return None
 
         # Check if it's the player's turn
         if view.two_player:
@@ -27,11 +26,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 interaction.user.id != view.author.id
                 and view.current_player == "X"
                 and interaction.user.id in (view.author.id, view.second_player.id)
-            ):
-                return await interaction.response.send_message(
-                    f"It's not your turn {interaction.user.mention}!", ephemeral=True
-                )
-            elif (
+            ) or (
                 interaction.user.id != view.second_player.id
                 and view.current_player == "O"
                 and interaction.user.id in (view.author.id, view.second_player.id)
@@ -39,15 +34,14 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
                 return await interaction.response.send_message(
                     f"It's not your turn {interaction.user.mention}!", ephemeral=True
                 )
-            elif interaction.user.id not in (view.author.id, view.second_player.id):
+            if interaction.user.id not in (view.author.id, view.second_player.id):
                 return await interaction.response.send_message(
                     f"You aren't a player {interaction.user.mention}!", ephemeral=True
                 )
-        else:
-            if interaction.user.id != view.author.id:
-                return await interaction.response.send_message(
-                    f"You aren't a player {interaction.user.mention}!", ephemeral=True
-                )
+        elif interaction.user.id != view.author.id:
+            return await interaction.response.send_message(
+                f"You aren't a player {interaction.user.mention}!", ephemeral=True
+            )
 
         if view.current_player == "X":
             self.style = discord.ButtonStyle.danger
@@ -152,7 +146,7 @@ class TicTacToe(discord.ui.View):
         for across in self.board:
             if across == ["X", "X", "X"]:
                 return "X"
-            elif across == ["O", "O", "O"]:
+            if across == ["O", "O", "O"]:
                 return "O"
 
         # vertical
@@ -163,7 +157,7 @@ class TicTacToe(discord.ui.View):
         # diagonal
         if self.board[0][0] == self.board[1][1] == self.board[2][2]:
             return self.board[0][0]
-        elif self.board[0][2] == self.board[1][1] == self.board[2][0]:
+        if self.board[0][2] == self.board[1][1] == self.board[2][0]:
             return self.board[0][2]
 
         if all(self.board[y][x] is not None for x in range(3) for y in range(3)):

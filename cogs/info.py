@@ -7,7 +7,6 @@ import discord
 import git
 import psutil
 from discord.ext import commands
-
 from utils.bot import Xeno
 from utils.context import XenoContext
 
@@ -59,15 +58,13 @@ class Information(commands.Cog):
                 f"{value:.0f}{name}" for name, value in non_zero_intervals
             )
             return result
-        else:
-            return "0s"
+        return "0s"
 
     @commands.command(alias=["stats", "botinfo"])
     async def info(self, ctx: XenoContext) -> None:
         """
         Tells you information about the bot itself.
         """
-
         commits = "\n".join(self.format_commit(c) for c in self.get_commits())
         memory = self.process.memory_info().rss / 1024**2
         total_memory = psutil.virtual_memory().total / 1024**3
@@ -102,7 +99,6 @@ class Information(commands.Cog):
     @commands.command()
     async def ping(self, ctx: XenoContext) -> None:
         """Returns the latency of the bot."""
-
         discord_latency = round(self.bot.latency * 1000)
         start = time.perf_counter()
         message = await ctx.send("Pong!", reply=True)

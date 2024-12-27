@@ -4,7 +4,6 @@ from typing import Literal
 
 import discord
 from discord.ext import commands
-
 from utils.bot import Xeno
 from utils.context import XenoContext
 from utils.errors import BlacklistedError, MaintenanceError
@@ -14,26 +13,34 @@ bot = Xeno(intents=discord.Intents.all())
 
 @bot.event
 async def on_ready() -> None:
+    """
+    Log the bot's information when it is ready.
+    """
     if bot.user is not None:
-        print(f"Logged in as {bot.user} ({bot.user.id})")
-    print(f"Launched at {bot.launch_time}")
+        bot.logger.info("Logged in as %s (ID: %s)\n", bot.user, str(bot.user.id))
 
     bot.owners = [bot.get_user(i) for i in bot.owner_ids]
 
 
 @bot.after_invoke
 async def command_counter(ctx: XenoContext) -> None:
+    """
+    Increment the command counter after every command execution.
+    """
     ctx.bot.command_counter += 1
 
 
 @bot.check_once
 async def blacklist(
     ctx: XenoContext,
-) -> Literal[True]:  # TODO: Check why this isn't working !!
+) -> Literal[
+    True
+]:  # TODO(HypeShadowFox88): Check why this isn't working !!  # noqa: E501, FIX002, TD003
     """
-    A check that gets applied before commands to make sure a blacklisted user can't use commands.
-    """
+    Check if a user is blacklisted from using commands.
 
+    Prevent blacklisted users from executing any bot commands.
+    """
     if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True
     raise BlacklistedError
@@ -42,9 +49,10 @@ async def blacklist(
 @bot.check_once
 async def maintenance(ctx: XenoContext) -> Literal[True]:
     """
-    A check that gets applied before commands to make sure that the bot isn't in maintenance.
-    """
+    Check if the bot is in maintenance mode.
 
+    Prevent command execution when maintenance mode is active.
+    """
     if not bot.maintenance or ctx.author.id in bot.owner_ids:
         return True
     raise MaintenanceError
@@ -53,9 +61,10 @@ async def maintenance(ctx: XenoContext) -> Literal[True]:
 @bot.check_once
 async def cooldown(ctx: XenoContext) -> Literal[True]:
     """
-    A check that gets applied before commands to make sure a user hasn't ran too many commands in X amount of time.
-    """
+    Check if the user has exceeded their command usage limit.
 
+    Ensures users don't execute too many commands within a specific time frame.
+    """
     if (
         ctx.author.id in bot.owner_ids
         or isinstance(ctx.author, discord.User)
@@ -66,7 +75,8 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
     bucket: commands.Cooldown | None = bot.cooldown.get_bucket(ctx.message)
 
     if not bucket:
-        raise RuntimeError("Cooldown Bucket does not exist!")
+        msg = "Cooldown Bucket does not exist!"
+        raise RuntimeError(msg)
 
     retry_after: float | None = bucket.update_rate_limit()
     if retry_after:
@@ -78,15 +88,23 @@ async def cooldown(ctx: XenoContext) -> Literal[True]:
 
 
 @bot.listen()
-async def on_message_edit(before, after):
+async def on_message_edit(before: discord.Message, after: discord.Message) -> None:
+    """
+    Process commands when messages are edited.
+    """
     if before.content == after.content:
         return
     await bot.process_commands(after)
 
 
 async def main() -> None:
+    """
+    Start the bot with the given token.
+    """
     async with bot:
-        await bot.start(os.environ["TOKEN"] if not os.environ["TEST"] else os.environ["TEST_TOKEN"])
+        await bot.start(
+            os.environ["TOKEN"] if not os.environ["TEST"] else os.environ["TEST_TOKEN"]
+        )
 
 
 if __name__ == "__main__":

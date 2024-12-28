@@ -5,7 +5,7 @@ ENV PYTHONIOENCODING utf-8
 
 WORKDIR /main
 
-RUN apk add --no-cache gcc python3-dev musl-dev linux-headers openssl git && rm -rf /var/cache/apk/*
+RUN apk add --no-cache gcc python3-dev musl-dev linux-headers openssl git bash && rm -rf /var/cache/apk/*
 
 ADD poetry.lock .
 ADD pyproject.toml .

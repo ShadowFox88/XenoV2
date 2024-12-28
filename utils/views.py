@@ -162,7 +162,10 @@ class DismissView(discord.ui.View):
         if not interaction.message:
             return
         if interaction.user.id in self.bot.owner_ids:
-            await self.bot.db.execute("DELETE FROM errors WHERE id = $1", self.error_id)
+            await self.bot.prisma.errors.update(
+                where={"ID": self.error_id},
+                data={"fixed": True},
+            )
             await interaction.message.delete()
             await interaction.response.send_message(
                 f"Error {self.error_id} has been dismissed!",

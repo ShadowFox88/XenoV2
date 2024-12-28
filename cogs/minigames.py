@@ -183,7 +183,7 @@ class Minigames(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["ttt", "tic-tac-toe", "tictactoe"])
-    async def tic_tac_toe(self, ctx: XenoContext, player: discord.User = None):  # type: ignore
+    async def tic_tac_toe(self, ctx: XenoContext, player: discord.User = None):
         embed = discord.Embed(
             title="Tic Tac Toe",
             description="Get 3 in a row to win!",

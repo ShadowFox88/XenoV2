@@ -4,9 +4,7 @@ from typing import Literal
 
 import discord
 from discord.ext import commands
-from utils.bot import Xeno
-from utils.context import XenoContext
-from utils.errors import BlacklistedError, MaintenanceError
+from utils import BlacklistedError, MaintenanceError, Xeno, XenoContext
 
 bot = Xeno(intents=discord.Intents.all())
 
@@ -17,7 +15,7 @@ async def on_ready() -> None:
     Log the bot's information when it is ready.
     """
     if bot.user is not None:
-        bot.logger.info("Logged in as %s (ID: %s)\n", bot.user, str(bot.user.id))
+        bot.logger.info("Logged in as %s (ID: %s)", bot.user, str(bot.user.id))
 
     bot.owners = [bot.get_user(i) for i in bot.owner_ids]
 

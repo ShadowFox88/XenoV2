@@ -6,24 +6,16 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
-from utils.errors import DiscordExceptions
-from utils.views import DismissView
+from utils import DiscordExceptions, DismissView, XenoCog
 
 if TYPE_CHECKING:
-    from utils.bot import Xeno
     from utils.context import XenoContext
 
 
-class Developer(commands.Cog):
+class Developer(XenoCog):
     """
     Developer Commands for the bot.
     """
-
-    def __init__(self, bot: Xeno) -> None:
-        """
-        Initialize the cog with the bot.
-        """
-        self.bot = bot
 
     async def cog_check(self, ctx: XenoContext) -> bool:
         """
@@ -89,7 +81,7 @@ class Developer(commands.Cog):
 
         await ctx.send(embed=embed, button=True)
 
-    @developer_group.command(aliases=["purge"])
+    @developer_group.command()
     async def purge(  # noqa: C901, PLR0912
         self,
         ctx: XenoContext,
@@ -193,21 +185,21 @@ class Developer(commands.Cog):
         """
         View an error report.
         """
-        data = await self.bot.db.fetch("SELECT * FROM errors WHERE id = $1", error_id)
+        error = await self.bot.prisma.errors.find_first(where={"ID": error_id})
 
-        if not data:
+        if not error:
             embed = discord.Embed(
                 description="Error Report Not Found",
                 colour=discord.Colour.red(),
             )
             return await ctx.send(embed=embed, reply=True, delete_after=30)
 
-        traceback = data[0]["traceback"]
-        user_id = data[0]["user_id"]
-        command = data[0]["command"]
-        guild_id = data[0]["guild_id"]
-        message_id = data[0]["developer_message_id"]
-        error_time = time.mktime(data[0]["error_time"].timetuple())
+        traceback = error.traceback
+        user_id = error.userID
+        command = error.command
+        guild_id = error.guildID
+        message_id = error.errorMessageID
+        error_time = time.mktime(error.errorTime.timetuple())
 
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
@@ -218,32 +210,35 @@ class Developer(commands.Cog):
             developer_message = None
 
         if fixed:
-            await self.bot.db.execute("DELETE FROM errors WHERE id = $1", id)
+            await self.bot.prisma.errors.update(
+                where={"ID": error_id},
+                data={"fixed": True},
+            )
             await developer_message.delete()
 
             embed = discord.Embed(
-                description=f"Error {id} Fixed",
+                description=f"Error {error_id} Fixed",
                 colour=discord.Colour.green(),
             )
             return await ctx.send(embed=embed, reply=True, delete_after=30)
 
         embed = discord.Embed(
-            title=f"Error Report: {id}",
+            title=f"Error Report: {error_id}",
             description=f"```py\n{traceback}```",
             colour=discord.Colour.red(),
         )
 
-        additional_info = f"""User: {self.bot.get_user(user_id).name} ({user_id})
+        additional_info = f"""User: {self.bot.get_user(user_id).name or "Not Found"} ({user_id})
         Command: {command}
         Guild ID: {guild_id}
-        Time: <t:{int(error_time)}:f>"""
+        Time: <t:{int(error_time)}:f>"""  # noqa: E501
 
         embed.add_field(name="Additional Info", value=additional_info)
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
 
         await ctx.send(
             embed=embed,
-            view=DismissView(id, ctx.author, self.bot, developer_message),
+            view=DismissView(error_id, ctx.author, self.bot, developer_message),
             delete_after=60,
         )
 
@@ -254,32 +249,30 @@ class Developer(commands.Cog):
         """
         Clear all error reports.
         """
-        data = await self.bot.db.fetch("SELECT * FROM errors")
+        errors = await self.bot.prisma.errors.find_many(where={"fixed": False})
 
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
         )
 
-        for i in data:
+        for i in errors:
             try:
-                developer_message = await webhook.fetch_message(
-                    i["developer_message_id"]
-                )
+                developer_message = await webhook.fetch_message(i.errorMessageID)
             except discord.errors.NotFound:
                 developer_message = None
 
             if developer_message:
                 await developer_message.delete()
 
-        await self.bot.db.execute("DELETE FROM errors")
+        await self.bot.prisma.errors.update_many(where={}, data={"fixed": True})
 
         embed = discord.Embed(
-            description=f"Cleared {len(data)} Error{'s' if len(data) != 1 else ''}",
+            description=f"Cleared {len(errors)} Error{'s' if len(errors) != 1 else ''}",
             colour=discord.Colour.green(),
         )
 
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
-        await ctx.send(embed=embed, reply=True, delete_after=30)
+        await ctx.send(embed=embed, reply=True)
 
     @developer_group.command(aliases=["re", "raise"])
     async def raise_error(self, ctx: XenoContext, error: str) -> discord.Message | None:
@@ -292,11 +285,11 @@ class Developer(commands.Cog):
         errors = DiscordExceptions().errors
 
         matches = difflib.get_close_matches(error, list(errors.keys()))
+        msg = f"{matches[0]}: Testing"
 
-        if error in list(errors.keys()):
-            matches = [errors[error]]
+        errors_matched = [errors[i] for i in matches]
 
-        if len(matches) == 0:
+        if len(errors_matched) == 0:
             await ctx.message.add_reaction(cross)
 
             embed = discord.Embed(
@@ -304,10 +297,13 @@ class Developer(commands.Cog):
             )
 
             return await ctx.send(embed=embed)
-        if len(matches) == 1:
+        if len(errors_matched) == 1:
             await ctx.message.add_reaction(tick)
 
-            self.bot.dispatch("command_error", ctx, matches[0]())
+            # All of the errors are given as base classes,
+            # and aren't called yet. We call the error here
+            # with our message to distinguish it from the other errors.
+            self.bot.dispatch("command_error", ctx, errors_matched[0](msg))
 
             return None
         await ctx.message.add_reaction(cross)
@@ -323,11 +319,3 @@ class Developer(commands.Cog):
             embed = discord.Embed(
                 discord.Colour.red(), description="Too many matches to display"
             )
-
-
-async def setup(bot: Xeno) -> None:
-    """
-    Load the Developer cog.
-    """
-    cog = Developer(bot)
-    await bot.add_cog(cog)

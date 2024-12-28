@@ -134,8 +134,12 @@ class Lime_And_Friends(commands.Cog):
                 color=discord.Color.green(),
             )
         else:
+            until_time = discord.utils.format_dt(
+                datetime.datetime.now(tz=datetime.datetime.utc)
+                + datetime.timedelta(**time)
+            )
             embed = discord.Embed(
-                description=f"Timed out {user.mention} until {discord.utils.format_dt(datetime.datetime.utcnow() + datetime.timedelta(**time))}",
+                description=f"Timed out {user.mention} until {until_time}",
                 color=discord.Color.green(),
             )
 
@@ -147,8 +151,3 @@ class Lime_And_Friends(commands.Cog):
 
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
         await confirm_message.edit(embed=embed, view=None)
-
-
-async def setup(bot: Xeno):
-    cog = Lime_And_Friends(bot)
-    await bot.add_cog(cog)

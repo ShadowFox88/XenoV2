@@ -1,0 +1,134 @@
+import datetime
+import os
+import time
+import pathlib
+
+import discord
+import git
+import psutil
+from discord.ext import commands
+from utils import XenoCog, Xeno, XenoContext
+
+
+class Information(XenoCog):
+    """
+    A cog providing information about the bot.
+    """
+
+    def __init__(self, bot: Xeno) -> None:
+        """
+        Initialize the Information cog.
+        """
+        self.bot = bot
+        self.process: psutil.Process = psutil.Process()
+
+    def get_commits(self, count: int = 5, branch: str = "master") -> list[git.Commit]:
+        """
+        Get the latest <num> commits from the repository.
+        """
+        repo = git.Repo(pathlib.Path.cwd())
+        return list(repo.iter_commits(branch, max_count=count))
+
+    def format_commit(self, commit: git.Commit) -> str:
+        """
+        Format a commit object into a human-readable string.
+        """
+        sha1 = commit.hexsha[:7]
+        message = (
+            commit.message.split("\n")[0]
+            if isinstance(commit.message, str)
+            else "No message found."
+        )  # to stop ugly red line
+        time = datetime.datetime.fromtimestamp(
+            commit.committed_date, tz=datetime.timezone.utc
+        )
+
+        time = round(time.timestamp())
+        disc_dt = f"<t:{time}:R>"
+
+        return f"[`{sha1}`](https://github.com/ShadowFox88/XenoV2/commit/{commit.hexsha}) {message} ({disc_dt})"  # noqa: E501
+
+    def strfdelta(self, tdelta: datetime.timedelta) -> str:
+        """
+        Convert a timedelta object to a human-readable string.
+        """
+        years, remainder = divmod(
+            tdelta.total_seconds(), 31536000
+        )  # seconds in a year = 31536000.
+        months, remainder = divmod(remainder, 2592000)  # seconds in a month = 2592000.
+        weeks, remainder = divmod(remainder, 604800)  # seconds in a week = 604800.
+        days, remainder = divmod(remainder, 86400)  # seconds in a day = 86400.
+        hours, remainder = divmod(remainder, 3600)  # seconds in an hour = 3600.
+        minutes, seconds = divmod(remainder, 60)
+        intervals = [
+            ("y", years),
+            ("mo", months),
+            ("w", weeks),
+            ("d", days),
+            ("h", hours),
+            ("m", minutes),
+            ("s", seconds),
+        ]
+        non_zero_intervals = [(name, value) for name, value in intervals if value != 0]
+        if non_zero_intervals:
+            return ", ".join(f"{value:.0f}{name}" for name, value in non_zero_intervals)
+        return "0s"
+
+    @commands.command(alias=["stats", "botinfo"])
+    async def info(self, ctx: XenoContext) -> None:
+        """
+        Tells you information about the bot itself.
+        """
+        commits = "\n".join(self.format_commit(c) for c in self.get_commits())
+        memory = self.process.memory_info().rss / 1024**2
+        total_memory = psutil.virtual_memory().total / 1024**3
+        usage = (memory / 1024) / total_memory * 100
+        uptime = self.strfdelta(discord.utils.utcnow() - self.bot.launch_time)
+
+        embed = discord.Embed(description="Latest Commits:\n" + commits)
+        embed.title = "Bot Information"
+        embed.colour = discord.Color.teal()
+
+        embed.set_author(
+            name=self.bot.owners[0].name, icon_url=self.bot.owners[0].display_avatar.url
+        )
+        embed.add_field(name="Guilds", value=len(self.bot.guilds))
+        embed.add_field(name="Users", value=len(self.bot.users))
+        embed.add_field(name="Commands Run", value=self.bot.command_counter + 1)
+        embed.add_field(name="Uptime", value=uptime)
+        embed.add_field(
+            name="Memory Usage (Process)",
+            value=f"`{memory:.2f}` MiB / `{total_memory:.2f}` GiB (`{usage:.2f}%`)",
+        )
+        embed.add_field(
+            name="CPU Usage",
+            value=f"`{self.process.cpu_percent() / psutil.cpu_count():.2f}%`",
+        )
+
+        embed.timestamp = discord.utils.utcnow()
+
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def ping(self, ctx: XenoContext) -> None:
+        """
+        Return the latency of the bot.
+        """
+        discord_latency = round(self.bot.latency * 1000)
+
+        start = time.perf_counter()
+        message = await ctx.send("Pong!", reply=True)
+        end = time.perf_counter()
+        typing_latency = end - start
+
+        start = time.perf_counter()
+        await self.bot.prisma.execute_raw("SELECT 1")
+        end = time.perf_counter()
+        db_latency = end - start
+
+        embed = discord.Embed(title="Pong!", colour=discord.Color.green())
+        embed.add_field(name="Discord Latency", value=f"`{discord_latency}ms`")
+        embed.add_field(name="Typing Latency", value=f"`{typing_latency:.2f}ms`")
+        embed.add_field(name="Database Latency", value=f"`{db_latency:.2f}ms`")
+
+        await message.edit(embed=embed, content=None)

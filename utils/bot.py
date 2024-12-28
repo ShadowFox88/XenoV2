@@ -4,6 +4,7 @@ import datetime
 import logging
 import os
 import re
+import sys
 from multiprocessing import Queue
 from typing import TYPE_CHECKING
 
@@ -13,12 +14,28 @@ import discord
 import logging_loki
 from discord.ext import commands
 from prisma import Prisma
-from utils.context import XenoContext
+
+from .context import XenoContext
+from .prisma import DatabaseOperations
 
 if TYPE_CHECKING:
     from collections.abc import Collection
 
     from prisma.types import Entities
+
+
+class RemoveUnnecessaryNoise(logging.Filter):
+    """
+    Remove unnecessary noise from the logs.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """
+        Filter the logs.
+        """
+        return not (
+            record.levelno == logging.WARNING and "referencing an unknown" in record.msg
+        )
 
 
 class Xeno(commands.AutoShardedBot):
@@ -56,24 +73,42 @@ class Xeno(commands.AutoShardedBot):
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
         self.DEFAULT_EXTENSIONS: list[str] = [
-            "cogs.info",
-            "cogs.tasks",
-            "cogs.ErrorHandler",
-            "cogs.minigames",
-            "cogs.developer",
-            "cogs.lime_and_friends",
+            "cogs.meta",
+            "cogs.internals",
+            "cogs.private",
         ]
 
-    async def start(self, token: str, *, reconnect: bool = True) -> None:
+    def setup_logging(self) -> None:
         """
-        Start the bot.
+        Set up the logging for the bot.
         """
+        application_name = "Xeno" if not os.environ["TEST"] else "Xeno-Testy"
         logging_loki.emitter.LokiEmitter.level_tag = "level"
-
         handler_loki = logging_loki.LokiQueueHandler(
             Queue(-1),
             url=os.environ["LOKI_URL"],
-            tags={"application": "XenoV2"},
+            tags={"application": application_name},
+            auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
+            version="1",
+        )
+        discord_handler_loki = logging_loki.LokiQueueHandler(
+            Queue(-1),
+            url=os.environ["LOKI_URL"],
+            tags={"application": application_name},
+            auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
+            version="1",
+        )
+        http_handler_loki = logging_loki.LokiQueueHandler(
+            Queue(-1),
+            url=os.environ["LOKI_URL"],
+            tags={"application": application_name},
+            auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
+            version="1",
+        )
+        state_handler_loki = logging_loki.LokiQueueHandler(
+            Queue(-1),
+            url=os.environ["LOKI_URL"],
+            tags={"application": application_name},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
@@ -86,12 +121,39 @@ class Xeno(commands.AutoShardedBot):
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.INFO)
 
-        self.logger: logging.Logger = logging.getLogger("discord")
-        self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(handler_loki)
-        self.logger.addHandler(file_handler)
-        logging.getLogger("discord.http").setLevel(logging.INFO)
+        stdout_handler = logging.StreamHandler(sys.stdout)
 
+        discord_logger = logging.getLogger("discord")
+        discord_logger.setLevel(logging.INFO)
+        discord_logger.addHandler(discord_handler_loki)
+        discord_logger.addHandler(file_handler)
+        discord_logger.addHandler(stdout_handler)
+
+        http_logger = logging.getLogger("discord.http")
+        http_logger.setLevel(logging.WARNING)
+        http_logger.addHandler(http_handler_loki)
+        http_logger.addHandler(file_handler)
+        http_logger.addHandler(stdout_handler)
+
+        state_logger = logging.getLogger("discord.state")
+        state_logger.setLevel(logging.WARNING)
+        state_logger.addHandler(state_handler_loki)
+        state_logger.addHandler(file_handler)
+        state_logger.addHandler(stdout_handler)
+
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        logger.addHandler(handler_loki)
+        logger.addHandler(file_handler)
+        logger.addHandler(stdout_handler)
+
+        self.logger = logger
+
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        """
+        Start the bot.
+        """
+        self.setup_logging()
         self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         self.log_handler = None
         self.token = token
@@ -124,6 +186,7 @@ class Xeno(commands.AutoShardedBot):
             password=os.environ["DATABASE_PASSWORD"],
             database=os.environ["DATABASE"],
         )  # only for use with jsk sql
+        # TODO(ShadowFox88): Subclass jiskaku to use prisma  # noqa: FIX002, TD003
 
         if not self.database:
             raise RuntimeError("Couldn't connect to database!")  # noqa: EM101, TRY003
@@ -138,6 +201,10 @@ class Xeno(commands.AutoShardedBot):
 
         self.prisma = Prisma()
         await self.prisma.connect()
+
+        self.blacklisted = await self.prisma.blacklist.find_many()
+
+        self.database_operations = DatabaseOperations(self.prisma)
 
     def get_error_webhook(self) -> discord.Webhook:
         """
@@ -189,7 +256,9 @@ class Xeno(commands.AutoShardedBot):
         Check if the user is blacklisted.
         """
         if ctx.guild:
-            return (ctx.guild.id in self.blacklisted) or (
-                ctx.author.id in self.blacklisted
+            guild_blacklisted = any(
+                ctx.guild.id == i.entityID for i in self.blacklisted
             )
-        return ctx.author.id in self.blacklisted
+        user_blacklisted = any(ctx.author.id == i.entityID for i in self.blacklisted)
+
+        return guild_blacklisted or user_blacklisted

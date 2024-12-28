@@ -7,7 +7,6 @@ generator client {
   provider             = "prisma-client-py"
   interface            = "asyncio"
   recursive_type_depth = 5
-  // output              = "/main/prisma/generated/client"
 }
 
 enum entityType {
@@ -38,9 +37,9 @@ model Entities {
 model Blacklist {
   entityID         BigInt   @id @unique
   entity           Entities @relation(fields: [entityID], references: [ID])
-  reason           String
+  reason           String?
   blacklistedOn    DateTime @default(now())
-  blacklistedUntil DateTime @default(now())
+  blacklistedUntil DateTime?
   blacklistActive  Boolean  @default(true)
 }
 
@@ -53,12 +52,14 @@ model UserChannels {
 
 model Errors {
   ID             Int              @id @unique @default(autoincrement())
+  errorName      String
   traceback      String
   userID         BigInt
   guildID        BigInt?
   errorTime      DateTime         @default(now())
   errorMessageID BigInt
   fixed          Boolean          @default(false)
+  command        String?
   ErrorReminders ErrorReminders[]
 }
 

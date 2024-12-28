@@ -13,7 +13,7 @@ __all__ = ("Lime_And_Friends",)
 
 class Private(Lime_And_Friends, name="Private"):
     """
-    For information relating to discord or the bot.
+    For commands and features available only in certain servers.
     """
 
 

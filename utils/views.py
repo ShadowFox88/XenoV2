@@ -42,7 +42,7 @@ class DeleteView(discord.ui.View):
             return None
         if interaction.user.id in (self.author.id, 606648465065246750):
             self.stop()
-            return interaction.message.delete()
+            return await interaction.message.delete()
         await interaction.response.send_message(
             f"This command was ran by {self.author.name}, so you can't delete it!",
             ephemeral=True,

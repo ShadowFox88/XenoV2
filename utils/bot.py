@@ -251,14 +251,33 @@ class Xeno(commands.AutoShardedBot):
         """
         return await super().get_context(message, cls=cls)
 
-    def is_blacklisted(self, ctx: XenoContext) -> bool:
+    async def is_blacklisted(self, ctx: XenoContext) -> bool:
         """
         Check if the user is blacklisted.
         """
         if ctx.guild:
-            guild_blacklisted = any(
-                ctx.guild.id == i.entityID for i in self.blacklisted
+            guild_blacklisted = next(
+                i for i in self.blacklisted if i.entityID == ctx.guild.id
             )
-        user_blacklisted = any(ctx.author.id == i.entityID for i in self.blacklisted)
+
+        user_blacklisted = next(
+            i for i in self.blacklisted if i.entityID == ctx.author.id
+        )
+
+        if (
+            user_blacklisted.blacklistedUntil
+            and user_blacklisted.blacklistedUntil < discord.utils.utcnow()
+        ):
+            await self.prisma.blacklist.delete(where={"entityID": ctx.author.id})
+            self.blacklisted.remove(user_blacklisted)
+            user_blacklisted = None
+
+        if (
+            guild_blacklisted.blacklistedUntil
+            and guild_blacklisted.blacklistedUntil < discord.utils.utcnow()
+        ):
+            await self.prisma.blacklist.delete(where={"entityID": ctx.guild.id})
+            self.blacklisted.remove(guild_blacklisted)
+            guild_blacklisted = None
 
         return guild_blacklisted or user_blacklisted

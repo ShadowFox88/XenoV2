@@ -5,15 +5,26 @@ from discord.ext import commands
 
 
 class BlacklistedError(commands.CheckFailure):
-    pass
+    """
+    An error that gets raised when a user is blacklisted from using the bot.
+    """
 
 
 class MaintenanceError(commands.CheckFailure):
-    pass
+    """
+    An error that gets raised when the bot is in maintenance mode.
+    """
 
 
 class DiscordExceptions:
-    def __init__(self):
+    """
+    A big LONG list of all errors I may ever need to raise.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize the class and add the errors to a big list.
+        """
         self.set_python_errors()
         self.set_base_errors()
         self.set_commands_errors()
@@ -34,13 +45,19 @@ class DiscordExceptions:
 
             self.errors[error_as_string] = error
 
-    def set_my_errors(self):
+    def set_my_errors(self) -> None:
+        """
+        Set my custom defined errors.
+        """
         self.my_errors = [
             BlacklistedError,
             MaintenanceError,
         ]
 
-    def set_python_errors(self):
+    def set_python_errors(self) -> None:
+        """
+        Set the core errors from python.
+        """
         self.python_errors = [
             OverflowError,
             DeprecationWarning,
@@ -108,7 +125,10 @@ class DiscordExceptions:
             BrokenPipeError,
         ]
 
-    def set_base_errors(self):
+    def set_base_errors(self) -> None:
+        """
+        Set the base errors from the discord module.
+        """
         self.base_errors = [
             discord.DiscordException,
             discord.ClientException,
@@ -127,7 +147,10 @@ class DiscordExceptions:
             discord.opus.OpusNotLoaded,
         ]
 
-    def set_commands_errors(self):
+    def set_commands_errors(self) -> None:
+        """
+        Set the errors from discord.ext.commands.
+        """
         self.commands_errors = [
             discord.ext.commands.CommandError,
             discord.ext.commands.ConversionError,

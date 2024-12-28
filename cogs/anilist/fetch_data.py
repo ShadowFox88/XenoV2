@@ -1,5 +1,4 @@
 import requests
-import aiohttp
 from anilist_errors import GraphQLError
 
 URL = "https://graphql.anilist.co"
@@ -24,6 +23,7 @@ query ($name: String, $page: Int) {
 }
 """
 
+
 async def fetch_data(name: str, *, page: int = 1) -> str | list[str]:
     variables = {"name": name, "page": page}
     response = requests.post(URL, json={"query": FETCH_QUERY, "variables": variables})
@@ -35,5 +35,3 @@ async def fetch_data(name: str, *, page: int = 1) -> str | list[str]:
 
     if data.get("errors"):
         raise GraphQLError(data["errors"])
-
-

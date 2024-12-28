@@ -174,7 +174,7 @@ class Xeno(commands.AutoShardedBot):
         Return the prefix for each user.
         """
         return commands.when_mentioned_or(
-            *["x-", "=="] if not os.environ["TEST"] else ["t;"]
+            *["x-", "=="] if not self.testing else ["t;"]
         )(self, message)
 
     async def setup_hook(self) -> None:

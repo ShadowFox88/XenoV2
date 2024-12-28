@@ -11,7 +11,7 @@ from .lime_and_friends import Lime_And_Friends
 __all__ = ("Lime_And_Friends",)
 
 
-class Private(Lime_And_Friends, name="Meta"):
+class Private(Lime_And_Friends, name="Private"):
     """
     For information relating to discord or the bot.
     """
@@ -19,6 +19,6 @@ class Private(Lime_And_Friends, name="Meta"):
 
 async def setup(bot: Xeno) -> None:
     """
-    Load the Meta cog.
+    Load the Private cog.
     """
     await bot.add_cog(Private(bot))

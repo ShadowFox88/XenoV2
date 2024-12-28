@@ -77,12 +77,13 @@ class Xeno(commands.AutoShardedBot):
             "cogs.internals",
             "cogs.private",
         ]
+        self.testing = os.getenv("TEST", "False").lower() in ("true", "1", "t")
 
     def setup_logging(self) -> None:
         """
         Set up the logging for the bot.
         """
-        application_name = "Xeno" if not os.environ["TEST"] else "Xeno-Testy"
+        application_name = "Xeno" if not self.testing else "Xeno-Testy"
         logging_loki.emitter.LokiEmitter.level_tag = "level"
         handler_loki = logging_loki.LokiQueueHandler(
             Queue(-1),
@@ -257,16 +258,17 @@ class Xeno(commands.AutoShardedBot):
         """
         guild_blacklisted = user_blacklisted = None
         if ctx.guild:
-            guild_blacklisted = next(
+            guild_blacklisted = [
                 i for i in self.blacklisted if i.entityID == ctx.guild.id
-            )
+            ]
+            guild_blacklisted = next(guild_blacklisted) if guild_blacklisted else None
 
-        user_blacklisted = next(
-            i for i in self.blacklisted if i.entityID == ctx.author.id
-        )
+        user_blacklisted = [i for i in self.blacklisted if i.entityID == ctx.author.id]
+        user_blacklisted = next(user_blacklisted) if user_blacklisted else None
 
         if (
-            user_blacklisted.blacklistedUntil
+            user_blacklisted
+            and user_blacklisted.blacklistedUntil
             and user_blacklisted.blacklistedUntil < discord.utils.utcnow()
         ):
             await self.prisma.blacklist.delete(where={"entityID": ctx.author.id})
@@ -274,7 +276,8 @@ class Xeno(commands.AutoShardedBot):
             user_blacklisted = None
 
         if (
-            guild_blacklisted.blacklistedUntil
+            guild_blacklisted
+            and guild_blacklisted.blacklistedUntil
             and guild_blacklisted.blacklistedUntil < discord.utils.utcnow()
         ):
             await self.prisma.blacklist.delete(where={"entityID": ctx.guild.id})

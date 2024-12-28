@@ -101,7 +101,9 @@ async def main() -> None:
     """
     async with bot:
         await bot.start(
-            os.environ["TOKEN"] if not os.environ["TEST"] else os.environ["TEST_TOKEN"]
+            os.environ["TOKEN"]
+            if os.getenv("TEST", "False").lower() not in ("true", "1", "t")
+            else os.environ["TEST_TOKEN"]
         )
 
 

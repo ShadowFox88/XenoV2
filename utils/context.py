@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 import discord
 from discord import PartialEmoji as GetEmoji
 from discord.ext import commands
+
 from utils import views
 
 if TYPE_CHECKING:

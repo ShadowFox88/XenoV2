@@ -253,8 +253,9 @@ class Xeno(commands.AutoShardedBot):
 
     async def is_blacklisted(self, ctx: XenoContext) -> bool:
         """
-        Check if the user is blacklisted.
+        Check if the user is blacklisted and delete if the blacklist has expired.
         """
+        guild_blacklisted = user_blacklisted = None
         if ctx.guild:
             guild_blacklisted = next(
                 i for i in self.blacklisted if i.entityID == ctx.guild.id

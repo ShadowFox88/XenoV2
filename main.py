@@ -39,7 +39,7 @@ async def blacklist(
 
     Prevent blacklisted users from executing any bot commands.
     """
-    if not bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
+    if not await bot.is_blacklisted(ctx) or ctx.author.id in bot.owner_ids:
         return True
     raise BlacklistedError
 

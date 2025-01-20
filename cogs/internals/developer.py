@@ -6,9 +6,11 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
-from utils import DiscordExceptions, DismissView, XenoCog
+
+from utils import DeleteView, DiscordExceptions, DismissView, XenoCog
 
 if TYPE_CHECKING:
+    from prisma.types import Errors  # pyright: ignore[reportAttributeAccessIssue]
     from utils.context import XenoContext
 
 
@@ -81,13 +83,14 @@ class Developer(XenoCog):
 
         await ctx.send(embed=embed, button=True)
 
+    # should only be used in lime and friends
     @developer_group.command()
-    async def purge(  # noqa: C901, PLR0912
+    async def purge(  # noqa: C901, PLR0912, PLR0915
         self,
         ctx: XenoContext,
-        arg1: discord.Member | discord.User | discord.Role | int | bool = None,
-        arg2: discord.Member | discord.User | int | bool = None,
-        arg3: discord.Member | discord.User | int | bool = None,
+        arg1: discord.Member | discord.User | discord.Role | int | bool | None = None,
+        arg2: discord.Member | discord.User | int | bool | None = None,
+        arg3: discord.Member | discord.User | int | bool | None = None,
     ) -> None | discord.Message:
         """
         Purges messages from a channel.
@@ -120,14 +123,25 @@ class Developer(XenoCog):
         limit = limit + 1  # To include the command message
 
         embed = discord.Embed(title="Purged Messages")
+        only_me = False
+
+        if isinstance(ctx.channel, discord.DMChannel):
+            manual_delete = True
+            only_me = True
 
         def check(message: discord.Message) -> bool:
             if target is None:
                 return message != ctx.message
-            return message.author == target and message != ctx.message
+            return (
+                message.author == target
+                and message != ctx.message
+                and (message.author == ctx.bot.user)
+                if only_me
+                else True
+            )
 
         if not manual_delete:
-            deleted_messages = await ctx.channel.purge(limit=limit, check=check)
+            deleted_messages = await ctx.channel.purge(limit=limit, check=check)  # pyright: ignore[reportAttributeAccessIssue]
 
             embed.title = "Purged Messages Successfully"
             embed.colour = discord.Colour.green()
@@ -151,7 +165,7 @@ class Developer(XenoCog):
 
         deleted_messages = []
 
-        for i in ctx.channel.history(limit=limit):
+        async for i in ctx.channel.history(limit=limit):
             if i == ctx.message:
                 continue
             deleted_messages.append(i)
@@ -181,7 +195,7 @@ class Developer(XenoCog):
         ctx: XenoContext,
         error_id: int,
         fixed: bool | None = False,  # noqa: FBT002
-    ) -> None | discord.Embed:
+    ) -> None | discord.Message:
         """
         View an error report.
         """
@@ -194,12 +208,13 @@ class Developer(XenoCog):
             )
             return await ctx.send(embed=embed, reply=True, delete_after=30)
 
-        traceback = error.traceback
+        short_error = error.errorName
         user_id = error.userID
         command = error.command
         guild_id = error.guildID
         message_id = error.errorMessageID
         error_time = time.mktime(error.errorTime.timetuple())
+        error_paste = await self.bot.mystbin.get_paste(error.errorPasteID)
 
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
@@ -214,31 +229,34 @@ class Developer(XenoCog):
                 where={"ID": error_id},
                 data={"fixed": True},
             )
-            await developer_message.delete()
+            if developer_message:
+                await developer_message.delete()
 
             embed = discord.Embed(
-                description=f"Error {error_id} Fixed",
+                description=f"Error #{error_id} Fixed",
                 colour=discord.Colour.green(),
+                url=error_paste.url,
             )
-            return await ctx.send(embed=embed, reply=True, delete_after=30)
+            return await ctx.send(embed=embed, reply=True)
 
         embed = discord.Embed(
-            title=f"Error Report: {error_id}",
-            description=f"```py\n{traceback}```",
-            colour=discord.Colour.red(),
+            title=f"Error Report: #{error_id}",
+            description=f"```py\n{short_error}```",
+            colour=discord.Colour.red() if not error.fixed else discord.Colour.green(),
+            url=error_paste.url,
         )
-
-        additional_info = f"""User: {self.bot.get_user(user_id).name or "Not Found"} ({user_id})
+        error_causer = await self.bot.fetch_user(user_id)
+        additional_info = f"""User: {error_causer.name if error_causer else "Not Found"} ({user_id})
         Command: {command}
         Guild ID: {guild_id}
         Time: <t:{int(error_time)}:f>"""  # noqa: E501
 
         embed.add_field(name="Additional Info", value=additional_info)
         embed.timestamp = embed.timestamp or discord.utils.utcnow()
-
-        await ctx.send(
+        view = DismissView(error_id, ctx.author, self.bot, developer_message)
+        view.message = await ctx.send(
             embed=embed,
-            view=DismissView(error_id, ctx.author, self.bot, developer_message),
+            view=view if not error.fixed else DeleteView(ctx.author),
             delete_after=60,
         )
 
@@ -249,7 +267,7 @@ class Developer(XenoCog):
         """
         Clear all error reports.
         """
-        errors = await self.bot.prisma.errors.find_many(where={"fixed": False})
+        errors: Errors = await self.bot.prisma.errors.find_many(where={"fixed": False})
 
         webhook = discord.Webhook.from_url(
             self.bot.error_webhook, session=self.bot.session
@@ -284,7 +302,11 @@ class Developer(XenoCog):
 
         errors = DiscordExceptions().errors
 
-        matches = difflib.get_close_matches(error, list(errors.keys()))
+        matches = (
+            difflib.get_close_matches(error, list(errors.keys()))
+            if error not in list(errors.keys())
+            else [error]
+        )
         msg = f"{matches[0]}: Testing"
 
         errors_matched = [errors[i] for i in matches]
@@ -317,5 +339,5 @@ class Developer(XenoCog):
             await ctx.send(embed=embed)
         except discord.HTTPException:
             embed = discord.Embed(
-                discord.Colour.red(), description="Too many matches to display"
+                colour=discord.Colour.red(), description="Too many matches to display"
             )

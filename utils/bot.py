@@ -6,22 +6,23 @@ import os
 import re
 import sys
 from multiprocessing import Queue
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 import asyncpg
 import discord
 import logging_loki
+import mystbin
+import redis.asyncio as redis
 from discord.ext import commands
+
 from prisma import Prisma
 
 from .context import XenoContext
 from .prisma import DatabaseOperations
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
-
-    from prisma.types import Entities
+    from prisma.models import Blacklist
 
 
 class RemoveUnnecessaryNoise(logging.Filter):
@@ -45,16 +46,16 @@ class Xeno(commands.AutoShardedBot):
     Inherits from commands.AutoShardedBot
     """
 
-    def __init__(self, *args: any, **kwargs: any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """
         Initialize the bot with the necessary attributes, and overwritten methods.
         """
         super().__init__(
-            command_prefix=self.get_prefix,
-            *args,  # noqa: B026
+            *args,
             **kwargs,
             case_insensitive=True,
             strip_after_prefix=True,
+            command_prefix=[],
         )
         self.emoji_list = {
             "animated_green_tick": "<a:AnimatedGreenTick:789586504950874132>",
@@ -67,9 +68,9 @@ class Xeno(commands.AutoShardedBot):
         self.command_counter = 0
         self.launch_time = discord.utils.utcnow()
         self.maintenance: bool = False
-        self.owner_ids: Collection[int] | None = [606648465065246750]
-        self.owners: list[discord.User] | list[None] = []
-        self.blacklisted: list[Entities] = []
+        self.owner_ids: list[int] = [606648465065246750]
+        self.owners: list[discord.User] = []
+        self.blacklisted: dict[int, Blacklist] = {}
         self.support_server: str = ""
         self.error_webhook: str = os.environ["ERROR_WEBHOOK"]
         self.DEFAULT_EXTENSIONS: list[str] = [
@@ -84,30 +85,30 @@ class Xeno(commands.AutoShardedBot):
         Set up the logging for the bot.
         """
         application_name = "Xeno" if not self.testing else "Xeno-Testy"
-        logging_loki.emitter.LokiEmitter.level_tag = "level"
+        logging_loki.emitter.LokiEmitter.level_tag = "level"  # pyright: ignore[reportAttributeAccessIssue] # this works.
         handler_loki = logging_loki.LokiQueueHandler(
-            Queue(-1),
+            Queue(-1),  # pyright: ignore[reportArgumentType] # BEFORE ANYONE SAYS ANYTHING THE DOCS SAY DO IT THIS WAY
             url=os.environ["LOKI_URL"],
             tags={"application": application_name},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
         discord_handler_loki = logging_loki.LokiQueueHandler(
-            Queue(-1),
+            Queue(-1),  # pyright: ignore[reportArgumentType] # BEFORE ANYONE SAYS ANYTHING THE DOCS SAY DO IT THIS WAY
             url=os.environ["LOKI_URL"],
             tags={"application": application_name},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
         http_handler_loki = logging_loki.LokiQueueHandler(
-            Queue(-1),
+            Queue(-1),  # pyright: ignore[reportArgumentType] # BEFORE ANYONE SAYS ANYTHING THE DOCS SAY DO IT THIS WAY
             url=os.environ["LOKI_URL"],
             tags={"application": application_name},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
             version="1",
         )
         state_handler_loki = logging_loki.LokiQueueHandler(
-            Queue(-1),
+            Queue(-1),  # pyright: ignore[reportArgumentType] # BEFORE ANYONE SAYS ANYTHING THE DOCS SAY DO IT THIS WAY
             url=os.environ["LOKI_URL"],
             tags={"application": application_name},
             auth=(os.environ["LOKI_USERNAME"], os.environ["LOKI_PASSWORD"]),
@@ -166,6 +167,8 @@ class Xeno(commands.AutoShardedBot):
         """
         await self.session.close()
         await self.database.close()
+        await self.redis.aclose()
+        await self.redis_pool.aclose()
         await super().close()
         await self.prisma.disconnect()
 
@@ -173,15 +176,14 @@ class Xeno(commands.AutoShardedBot):
         """
         Return the prefix for each user.
         """
-        return commands.when_mentioned_or(
-            *["x-", "=="] if not self.testing else ["t;"]
-        )(self, message)
+        prefixes = ["x-", "=="] if not self.testing else ["t;"]
+        return commands.when_mentioned_or(*prefixes)(self, message)
 
     async def setup_hook(self) -> None:
         """
         Set up the bot.
         """
-        self.database: asyncpg.Pool[any] | any = await asyncpg.create_pool(
+        self.database: asyncpg.Pool = await asyncpg.create_pool(
             host=os.environ["DATABASE_HOST"],
             user=os.environ["DATABASE_USER"],
             password=os.environ["DATABASE_PASSWORD"],
@@ -203,9 +205,18 @@ class Xeno(commands.AutoShardedBot):
         self.prisma = Prisma()
         await self.prisma.connect()
 
-        self.blacklisted = await self.prisma.blacklist.find_many()
+        self.blacklisted = {
+            i.entityID: i for i in await self.prisma.blacklist.find_many()
+        }
 
         self.database_operations = DatabaseOperations(self.prisma)
+        self.mystbin = mystbin.Client(
+            session=self.session, root_url="https://paste.vahin.dev"
+        )
+        self.redis_pool = redis.ConnectionPool.from_url(
+            f"redis://:{os.environ['REDIS_PASSWORD']}@XenoRedis:6379/0"
+        )
+        self.redis = redis.Redis(connection_pool=self.redis_pool)
 
     def get_error_webhook(self) -> discord.Webhook:
         """
@@ -245,8 +256,8 @@ class Xeno(commands.AutoShardedBot):
         self,
         message: discord.Message | discord.Interaction[discord.Client],
         *,
-        cls: any = XenoContext,
-    ) -> any:
+        cls: type[XenoContext] = XenoContext,
+    ) -> XenoContext:
         """
         Get the context of the message.
         """
@@ -257,14 +268,11 @@ class Xeno(commands.AutoShardedBot):
         Check if the user is blacklisted and delete if the blacklist has expired.
         """
         guild_blacklisted = user_blacklisted = None
-        if ctx.guild:
-            guild_blacklisted = [
-                i for i in self.blacklisted if i.entityID == ctx.guild.id
-            ]
-            guild_blacklisted = next(guild_blacklisted) if guild_blacklisted else None
 
-        user_blacklisted = [i for i in self.blacklisted if i.entityID == ctx.author.id]
-        user_blacklisted = next(user_blacklisted) if user_blacklisted else None
+        if ctx.guild:
+            guild_blacklisted: Blacklist | None = self.blacklisted.get(ctx.guild.id)
+
+        user_blacklisted: Blacklist | None = self.blacklisted.get(ctx.author.id)
 
         if (
             user_blacklisted
@@ -272,16 +280,17 @@ class Xeno(commands.AutoShardedBot):
             and user_blacklisted.blacklistedUntil < discord.utils.utcnow()
         ):
             await self.prisma.blacklist.delete(where={"entityID": ctx.author.id})
-            self.blacklisted.remove(user_blacklisted)
+            self.blacklisted.pop(user_blacklisted.entityID)
             user_blacklisted = None
 
         if (
             guild_blacklisted
             and guild_blacklisted.blacklistedUntil
             and guild_blacklisted.blacklistedUntil < discord.utils.utcnow()
+            and ctx.guild
         ):
             await self.prisma.blacklist.delete(where={"entityID": ctx.guild.id})
-            self.blacklisted.remove(guild_blacklisted)
+            self.blacklisted.pop(guild_blacklisted.entityID)
             guild_blacklisted = None
 
-        return guild_blacklisted or user_blacklisted
+        return bool(guild_blacklisted or user_blacklisted)

@@ -1,6 +1,7 @@
-from datetime import datetime
+import datetime
 
 from discord.ext import tasks
+
 from utils import XenoCog
 
 
@@ -23,11 +24,12 @@ class Tasks(XenoCog):
         self.bot.logger.info("Updating blacklist...")
 
         await self.bot.prisma.blacklist.delete_many(
-            where={"expires": {"lt": datetime.datetime.now(tz=datetime.UTC)}}
+            where={"expires": {"lt": datetime.datetime.now(tz=datetime.UTC)}}  # pyright: ignore[reportArgumentType]
         )
 
         self.bot.blacklisted.clear()
-        self.bot.blacklisted = await self.bot.prisma.blacklist.find_many()
+        results = await self.bot.prisma.blacklist.find_many()
+        self.bot.blacklisted = {i.entityID: i for i in results}
 
         self.bot.logger.info("Blacklist updated.")
 

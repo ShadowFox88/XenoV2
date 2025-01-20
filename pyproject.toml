@@ -1,10 +1,11 @@
 [tool.poetry]
-name = "xenov2"
+name = "Xeno V2"
 version = "0.1.0"
 description = ""
 authors = ["Vahin Mehra <vahin@vahin.dev>"]
 license = "AGPL-3.0"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.12.8"
@@ -21,8 +22,41 @@ psutil = "^6.1.1"
 humanfriendly = "^10.0"
 python-logging-loki = "^0.3.1"
 prisma = "^0.15.0"
+mystbin-py = "^7.1.1"
+redis = {extras = ["hiredis"], version = "^5.2.1"}
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = ["*"]
+exclude = ["**/node_modules",
+    "**/__pycache__",
+    ".venv",
+]
+defineConstant = { DEBUG = true }
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+
+reportIncompatibleVariableOverride = false
+reportIncompatibleMethodOverride = false
+
+pythonVersion = "3.12.8"
+pythonPlatform = "Linux"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "INP001",
+    "D211",
+    "D212",
+    "D200",
+    "COM812",
+    "D203",
+    "ISC001",
+    "D100",
+    "FAST002",
+    "D103",
+]

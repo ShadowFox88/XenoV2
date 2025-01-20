@@ -1,13 +1,13 @@
 import datetime
-import os
-import time
 import pathlib
+import time
 
 import discord
 import git
 import psutil
 from discord.ext import commands
-from utils import XenoCog, Xeno, XenoContext
+
+from utils import Xeno, XenoCog, XenoContext
 
 
 class Information(XenoCog):
@@ -46,7 +46,7 @@ class Information(XenoCog):
         time = round(time.timestamp())
         disc_dt = f"<t:{time}:R>"
 
-        return f"[`{sha1}`](https://github.com/ShadowFox88/XenoV2/commit/{commit.hexsha}) {message} ({disc_dt})"  # noqa: E501
+        return f"[`{sha1}`](https://github.com/ShadowFox88/XenoV2/commit/{commit.hexsha}) {disc_dt} | {message}"  # noqa: E501
 
     def strfdelta(self, tdelta: datetime.timedelta) -> str:
         """
@@ -102,7 +102,7 @@ class Information(XenoCog):
         )
         embed.add_field(
             name="CPU Usage",
-            value=f"`{self.process.cpu_percent() / psutil.cpu_count():.2f}%`",
+            value=f"`{self.process.cpu_percent() / (psutil.cpu_count() or 1):.2f}%`",
         )
 
         embed.timestamp = discord.utils.utcnow()
@@ -117,7 +117,7 @@ class Information(XenoCog):
         discord_latency = round(self.bot.latency * 1000)
 
         start = time.perf_counter()
-        message = await ctx.send("Pong!", reply=True)
+        message = await ctx.reply("Pong!")
         end = time.perf_counter()
         typing_latency = end - start
 

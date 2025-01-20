@@ -6,12 +6,12 @@ For commands and features available only in certain servers.
 
 from utils.bot import Xeno
 
-from .lime_and_friends import Lime_And_Friends
+from .lime_and_friends import LimeAndFriends
 
-__all__ = ("Lime_And_Friends",)
+__all__ = ("LimeAndFriends",)
 
 
-class Private(Lime_And_Friends, name="Private"):
+class Private(LimeAndFriends, name="Private"):
     """
     For commands and features available only in certain servers.
     """

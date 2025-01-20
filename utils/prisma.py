@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from prisma.enums import entityType
+
 if TYPE_CHECKING:
     from prisma import Prisma
-    from prisma.models import Entites
+    from prisma.models import Entities
 
 
 class DatabaseOperations:
@@ -22,13 +24,15 @@ class DatabaseOperations:
         """
         Create a guild in the database.
         """
-        await self.prisma.entities.create(data={"ID": guild_id, "type": "GUILD"})
+        await self.prisma.entities.create(
+            data={"ID": guild_id, "type": entityType.GUILD}
+        )
 
     async def create_user(self, user_id: int) -> None:
         """
         Create a user in the database.
         """
-        await self.prisma.entities.create(data={"ID": user_id, "type": "USER"})
+        await self.prisma.entities.create(data={"ID": user_id, "type": entityType.USER})
 
     async def delete_user(self, user_id: int) -> None:
         """
@@ -42,13 +46,13 @@ class DatabaseOperations:
         """
         await self.prisma.entities.delete(where={"ID": guild_id})
 
-    async def get_user(self, user_id: int) -> Entites:
+    async def get_user(self, user_id: int) -> Entities | None:
         """
         Get a user from the database.
         """
         return await self.prisma.entities.find_first(where={"ID": user_id})
 
-    async def get_guild(self, guild_id: int) -> Entites:
+    async def get_guild(self, guild_id: int) -> Entities | None:
         """
         Get a guild from the database.
         """

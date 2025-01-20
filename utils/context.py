@@ -35,7 +35,7 @@ class XenoContext(commands.Context["Xeno"]):
         *,
         button: bool = False,
         reply: bool = False,
-        **kwargs: any,
+        **kwargs: Any,  # noqa: ANN401
     ) -> discord.Message:
         """
         Send a message with the given content and kwargs.
@@ -70,8 +70,15 @@ class XenoContext(commands.Context["Xeno"]):
         if button:
             kwargs["view"] = views.DeleteView(author=self.author)
         if reply:
-            return await super().reply(content, **kwargs)
-        return await super().send(content, **kwargs)
+            msg = await super().reply(content, **kwargs)
+            if button:
+                kwargs["view"].message = msg
+            return msg
+
+        msg = await super().send(content, **kwargs)
+        if button:
+            kwargs["view"].message = msg
+        return msg
 
     async def confirm(  # noqa: PLR0913
         self,
@@ -84,7 +91,7 @@ class XenoContext(commands.Context["Xeno"]):
         remove_view_after: bool = True,
         no_reply: bool = True,
         ephemeral: bool = True,
-        **kwargs: any,
+        **kwargs: Any,  # noqa: ANN401
     ) -> bool | None:
         """
         Send a confirmation message to the user.
@@ -102,7 +109,7 @@ class XenoContext(commands.Context["Xeno"]):
         elif message:
             message = f"{message}\n\n{confirm_message}"
         view = views.ConfirmView(self.author, timeout=timeout)
-        msg = await self.send(
+        msg = view.message = await self.send(
             content=message,
             embed=embed,
             reply=no_reply,

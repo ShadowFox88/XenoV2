@@ -3,7 +3,9 @@ from __future__ import annotations
 import traceback
 
 import discord
+import mystbin
 from discord.ext import commands
+
 from utils import BlacklistedError, MaintenanceError, XenoCog, XenoContext
 
 user_errors: dict[type[Exception], tuple[str, str]] = {
@@ -132,8 +134,10 @@ class ErrorHandler(XenoCog):
         """
         Check if the error is fixed.
         """
-        error = await self.bot.prisma.errors.find_first(where={"errorName": str(error)})
-        return False if not error else error.fixed
+        found_error = await self.bot.prisma.errors.find_first(
+            where={"errorName": str(error)}
+        )
+        return False if not found_error else found_error.fixed
 
     @commands.Cog.listener()
     async def on_command_error(
@@ -160,7 +164,7 @@ class ErrorHandler(XenoCog):
 
             await ctx.message.add_reaction(self.bot.emoji_list["animated_red_cross"])
 
-            return await ctx.send(embed=embed, reply=True, delete_after=30)
+            return await ctx.reply(embed=embed, delete_after=30)
 
         # ============================
         # Checks if the error is known
@@ -176,7 +180,7 @@ class ErrorHandler(XenoCog):
                 description="An unexpected error occurred while running this command, my developers are already aware and are working to fix this.",  # noqa: E501
             )
             embed.timestamp = discord.utils.utcnow()
-            return await ctx.send(embed=embed, reply=True)
+            return await ctx.reply(embed=embed)
 
         # ==================================
         # Runs if error is not handled above
@@ -197,6 +201,21 @@ class ErrorHandler(XenoCog):
                 where={"errorName": str(error)}
             )  # the error was fixed but now isn't, so we need to get the error again
         else:
+            paste = await self.bot.mystbin.create_paste(
+                files=[
+                    mystbin.File(
+                        filename="error.py",
+                        content="".join(traceback.format_exception(error)),
+                    )
+                ]
+            )
+            await self.bot.prisma.pastes.create(
+                data={
+                    "ID": paste.id,
+                    "ownerID": self.bot.owner_ids[0],
+                    "safety": paste.security_token if paste.security_token else "",
+                }
+            )
             generated_error = await self.bot.prisma.errors.create(
                 data={
                     "command": ctx.message.content,
@@ -205,8 +224,13 @@ class ErrorHandler(XenoCog):
                     "traceback": "".join(traceback.format_exception(error)),
                     "errorMessageID": message.id,
                     "errorName": str(error),
+                    "errorPasteID": paste.id,
                 }
             )
+
+        if not generated_error:
+            msg = "An error occurred while reporting the error."
+            raise commands.CommandError(msg)
 
         error_id = generated_error.ID
 
@@ -224,7 +248,7 @@ class ErrorHandler(XenoCog):
         await ctx.message.add_reaction(self.bot.emoji_list["animated_red_cross"])
 
         try:
-            await ctx.send(embed=embed, reply=True)
+            await ctx.reply(embed=embed)
         except discord.errors.HTTPException:
             await ctx.send(
                 message="I couldn't find your original message, was it deleted?",

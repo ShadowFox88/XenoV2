@@ -14,26 +14,35 @@ services:
       interval: 2s
       timeout: 1s
       retries: 5
-      
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    restart: always
-    ports:
-      - "8888:80"
-    env_file:
-      - pgadmin.env
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
 
-  # db_migrations:
-  #   container_name: Prisma
-  #   build:
-  #     context: ./prisma
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  redis:
+    container_name: "XenoRedis"
+    image: redis:7.4-alpine
+    restart: always
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --save 20 1 --loglevel warning --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+    healthcheck:
+        test: ["CMD-SHELL", "echo 'auth ${REDIS_PASSWORD}\nping' | redis-cli | grep PONG"]
+        interval: 5s
+        timeout: 3s
+        retries: 5
+
+  database_sync:
+    container_name: "XenoSync"
+    build:
+      context: .
+      dockerfile: ./Dockerfile_Prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   bot:
     container_name: "Xeno"
@@ -41,13 +50,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # volumes:
-    #   - .:/main
     depends_on:
       postgres:
         condition: service_healthy
-      # db_migrations:
-      #   condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      database_sync:
+        condition: service_completed_successfully
     env_file:
       - .env
     environment:
@@ -62,3 +71,4 @@ volumes:
   pg_data:
   .:
   pgadmin-data:
+  redis_data:

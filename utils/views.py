@@ -19,12 +19,14 @@ class DeleteView(discord.ui.View):
         """
         super().__init__(timeout=None)
         self.author = author
+        self.message: discord.Message | None = None
 
     async def on_timeout(self) -> None:
         """
         Remove the view after the timeout.
         """
-        await self.message.edit(view=None)
+        if self.message:
+            await self.message.edit(view=None)
 
     @discord.ui.button(
         emoji="\U0001f5d1",
@@ -78,15 +80,17 @@ class ConfirmView(discord.ui.View):
         """
         Initialize the view.
         """
-        super().__init__(timeout=timeout)
         self.author = author
         self.value: bool | None = None
+        self.message: discord.Message | None = None
+        super().__init__(timeout=timeout)
 
     async def on_timeout(self) -> None:
         """
         Remove the view after the timeout.
         """
-        await self.message.edit(view=None)
+        if self.message:
+            await self.message.edit(view=None)
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
     async def yes(
@@ -145,12 +149,14 @@ class DismissView(discord.ui.View):
         self.error_id = error_id
         self.bot = bot
         self.developer_message = developer_message
+        self.message: discord.Message | None = None
 
     async def on_timeout(self) -> None:
         """
         Remove the view after the timeout.
         """
-        await self.message.edit(view=None)
+        if self.message:
+            await self.message.edit(view=None)
 
     @discord.ui.button(label="Fixed/Ignored", style=discord.ButtonStyle.green)
     async def dismiss(

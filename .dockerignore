@@ -1,10 +1,18 @@
-example.env
-LICENSE
-requirements.dev.txt
+# Docker
+.dockerignore
+Dockerfile
+Dockerfile_Prisma
+docker-compose.yml
+
+# Unnecessary files
+*.log
+.devcontainer/
+.vscode/
+.venv/
+__pycache__/
+*.pyc
 README.md
-.vscode
-.github
-.gitignore
-__pycache__
-.pdm_python
-pdm.lock
+start_bot.sh
+LICENSE
+pgadmin.env
+.env

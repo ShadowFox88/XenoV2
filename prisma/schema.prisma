@@ -32,15 +32,16 @@ model Entities {
   Blacklist      Blacklist?
   UserChannels   UserChannels[]
   ErrorReminders ErrorReminders[] @relation("ErrorReminders")
+  Pastes         Pastes[]
 }
 
 model Blacklist {
-  entityID         BigInt   @id @unique
-  entity           Entities @relation(fields: [entityID], references: [ID])
+  entityID         BigInt    @id @unique
+  entity           Entities  @relation(fields: [entityID], references: [ID])
   reason           String?
-  blacklistedOn    DateTime @default(now())
+  blacklistedOn    DateTime  @default(now())
   blacklistedUntil DateTime?
-  blacklistActive  Boolean  @default(true)
+  blacklistActive  Boolean   @default(true)
 }
 
 model UserChannels {
@@ -61,6 +62,8 @@ model Errors {
   fixed          Boolean          @default(false)
   command        String?
   ErrorReminders ErrorReminders[]
+  errorPasteID   String           
+  errorPaste     Pastes           @relation(fields: [errorPasteID], references: [ID])
 }
 
 model ErrorReminders {
@@ -70,4 +73,13 @@ model ErrorReminders {
   users   Entities @relation("ErrorReminders", fields: [userID], references: [ID])
 
   @@id([errorID, userID])
+}
+
+model Pastes {
+  ID        String   @id
+  createdAt DateTime @default(now())
+  ownerID   BigInt
+  entity    Entities @relation(fields: [ownerID], references: [ID])
+  safety    String
+  Errors    Errors[]
 }

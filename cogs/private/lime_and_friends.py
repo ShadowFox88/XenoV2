@@ -1,33 +1,61 @@
+# type: ignore  # noqa: PGH003
+# fmt: off
+
+from __future__ import annotations
+
 import datetime
+import inspect
 
 import discord
 from discord.ext import commands
-from utils.bot import Xeno
-from utils.context import XenoContext
-from utils.views import ConfirmView
+
+from utils import ConfirmView, IncompatibleOptionsProvided, XenoCog, XenoContext
+
+LIME_AND_FRIENDS_GUILD = 1265697842475831397
 
 
-class Lime_And_Friends(commands.Cog):
-    def __init__(self, bot: Xeno):
-        self.bot = bot
+class TimeoutTime(commands.FlagConverter):
+    seconds: int = 0
+    minutes: int = 0
+    hours: int = 0
+    days: int = 0
+    weeks: int = 0
 
-    async def cog_check(self, ctx):
-        return (ctx.guild.id == 1265697842475831397) or ctx.bot.is_owner(ctx.author)
+
+class LimeAndFriends(XenoCog):
+    """
+    Commands for the Lime and Friends private guild.
+    """
+
+    async def cog_check(self, ctx: XenoContext) -> bool:  # pyright: ignore[reportIncompatibleMethodOverride]
+        """
+        Ensure the command is only available in the Lime and Friends guild.
+        """
+        return (
+            ctx.guild.id == LIME_AND_FRIENDS_GUILD if ctx.guild else False
+        ) or await self.bot.is_owner(ctx.author)
 
     @commands.command()
     async def unpin(self, ctx: XenoContext, message_id: int | None) -> None:
         if message_id and ctx.reference:
-            raise AssertionError
+            msg = "You can only provide a message ID or a reference, not both."
+            raise IncompatibleOptionsProvided(msg)
 
         if message_id:
             message = await ctx.fetch_message(message_id)
 
-        elif ctx.message.reference:
+        if ctx.message.reference:
             message = ctx.reference
+            if not message:
+                msg = "The message you are replying to was not found."
+                raise commands.MessageNotFound(msg)
 
         else:
-            await ctx.send("Please provide a message to unpin")
-            return
+            raise commands.MissingRequiredArgument(
+                commands.parameters.Parameter(
+                    name="message_id", kind=inspect.Parameter.POSITIONAL_ONLY
+                )
+            )
 
         if not message.pinned:
             raise AssertionError
@@ -52,7 +80,13 @@ class Lime_And_Friends(commands.Cog):
 
     @commands.is_owner()
     @commands.command()
+    @commands.guild_only()
     async def mass_slowmode(self, ctx: XenoContext, slowmode: int) -> None:
+        """
+        Set the slowmode of everything.
+        """
+        if not ctx.guild:
+            return
         for channel in ctx.guild.text_channels:
             await channel.edit(slowmode_delay=slowmode)
 
@@ -64,20 +98,13 @@ class Lime_And_Friends(commands.Cog):
         await ctx.message.add_reaction(self.bot.emoji_list["animated_green_tick"])
         await ctx.send(embed=embed)
 
-    class TimeoutTime(commands.FlagConverter):
-        seconds: int = 0
-        minutes: int = 0
-        hours: int = 0
-        days: int = 0
-        weeks: int = 0
-
     @commands.is_owner()
     @commands.command()
     async def timeout(
         self, ctx: XenoContext, user: commands.MemberConverter, *, times: TimeoutTime
     ) -> None:
         """
-        Times out a user for a specific amount of time. Maximum time is 4 weeks.
+        Time out a user for a specific amount of time. Maximum time is 4 weeks.
         """
         time = {
             "seconds": times.seconds,
@@ -88,9 +115,8 @@ class Lime_And_Friends(commands.Cog):
         }
 
         if datetime.timedelta(**time) > datetime.timedelta(weeks=4):
-            raise commands.BadArgument(
-                "You can only timeout a user for a maximum of 4 weeks."
-            )
+            msg = "You can only timeout a user for a maximum of 4 weeks."
+            raise commands.BadArgument(msg)
 
         if not any(time.values()) or datetime.timedelta(**time) < datetime.timedelta(
             seconds=0
@@ -107,7 +133,7 @@ class Lime_And_Friends(commands.Cog):
 
         view = ConfirmView(ctx.author)
 
-        confirm_message = await ctx.reply(embed=embed, view=view)
+        confirm_message = view.message = await ctx.reply(embed=embed, view=view)
 
         await view.wait()
         if view.value is None:

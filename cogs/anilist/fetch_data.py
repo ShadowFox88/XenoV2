@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests
 from anilist_errors import GraphQLError
 
@@ -24,7 +26,7 @@ query ($name: String, $page: Int) {
 """
 
 
-async def fetch_data(name: str, *, page: int = 1) -> str | list[str]:
+async def fetch_data(name: str, *, page: int = 1) -> str | list[str] | None:
     variables = {"name": name, "page": page}
     response = requests.post(URL, json={"query": FETCH_QUERY, "variables": variables})
 
